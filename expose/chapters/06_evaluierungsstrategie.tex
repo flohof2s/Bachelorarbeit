@@ -1,14 +1,22 @@
-Zur Überprüfung der Zielerreichung wird folgende Evaluierungsstrategie vorgesehen:
+Zur Überprüfung der Zielerreichung und zur Beantwortung der formulierten Fragestellungen wird eine quantitative Evaluierung der entwickelten Ansätze durchgeführt.
+
+Grundlage der Evaluation bildet ein Referenzdatensatz (Ground Truth), der strukturierte Zielwerte für ausgewählte Produktdaten enthält. Dieser dient als Vergleichsbasis zur Bewertung der durch die Ansätze erzeugten Ergebnisse.
+
+Die Evaluierung erfolgt anhand definierter Key Performance Indicators (KPIs), die sowohl die Qualität als auch die Strukturtreue der erzeugten Daten abbilden:
 
 \begin{itemize}
-    \item Evaluationsgegenstand: [Was genau wird evaluiert?]
-    \item Kriterien: [z.\,B. Qualität, Genauigkeit, Nutzbarkeit, Performance]
-    \item Vorgehen: [z.\,B. Vergleich, Test, Expertenbewertung, Fallstudie]
-    \item Erfolgsmaß: [Woran erkennst du, dass das Ziel erreicht wurde?]
+    \item \textbf{Schema Compliance Rate:} Anteil der generierten Datensätze, die dem vorgegebenen Datenbankschema entsprechen
+    \item \textbf{Vollständigkeit (Coverage):} Anteil der korrekt befüllten Datenfelder im Verhältnis zu allen erforderlichen Feldern
+    \item \textbf{Konsistenz:} Grad der strukturellen und semantischen Einheitlichkeit der erzeugten Daten
+    \item \textbf{Exact Match Rate:} Übereinstimmung der generierten Werte mit dem Ground Truth für das Referenzdatenfeld
+    \item \textbf{Precision, Recall und F1-Score:} Bewertung der Extraktionsqualität für das Referenzdatenfeld
+    \item \textbf{Effizienzmetriken:} Laufzeit sowie geschätzte Verarbeitungskosten der jeweiligen Ansätze
 \end{itemize}
 
-Mögliche Risiken der Evaluierung bestehen in:
-\begin{itemize}
-    \item Risiko 1
-    \item Risiko 2
-\end{itemize}
+Zur Vergleichbarkeit wird sowohl der LLM-basierte Ansatz als auch der regelbasierte Ansatz auf denselben Datensatz angewendet. Die Ergebnisse werden anschließend systematisch gegenübergestellt.
+
+Die Auswertung erfolgt in mehreren Schritten: Zunächst werden die einzelnen Metriken berechnet und quantitativ analysiert. Anschließend werden die Ergebnisse interpretiert, um Unterschiede in der Leistungsfähigkeit, Robustheit gegenüber variierenden Eingabeformaten sowie potenzielle Fehlerquellen zu identifizieren.
+
+Darüber hinaus wird untersucht, inwieweit die Ergebnisse auf andere Datensätze oder Anwendungsfälle übertragbar sind. Dabei werden insbesondere die Grenzen des LLM-basierten Ansatzes hinsichtlich Schema-Konformität, Konsistenz und Reproduzierbarkeit berücksichtigt.
+
+Die Evaluierung ermöglicht somit eine fundierte Bewertung der Frage, ob und unter welchen Bedingungen ein LLM-basierter Ansatz gegenüber klassischen regelbasierten Verfahren Vorteile bietet.

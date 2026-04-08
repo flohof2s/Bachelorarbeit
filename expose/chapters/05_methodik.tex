@@ -1,13 +1,11 @@
-Zur Bearbeitung der Fragestellungen wird ein [theoretisches / empirisches / gemischtes] Vorgehen gewählt.
+Zur Beantwortung der formulierten Fragestellungen wird ein kombinierter Ansatz aus konzeptioneller Entwicklung, prototypischer Implementierung sowie quantitativer Evaluation verfolgt.
 
-Das methodische Vorgehen umfasst folgende Schritte:
-\begin{enumerate}
-    \item Systematische Literaturrecherche zu [Thema]
-    \item Analyse von [Gegenstand / Anforderungen / Datenbasis]
-    \item Entwicklung bzw. Auswahl eines Lösungsansatzes
-    \item Anwendung des Lösungsansatzes auf [Anwendungsfall]
-    \item Bewertung der Ergebnisse
-\end{enumerate}
+Zunächst erfolgt eine systematische Analyse der Ausgangsdaten sowie der Anforderungen des zugrunde liegenden Datenbankschemas. Dabei werden die relevanten Datenfelder, deren Struktur sowie notwendige Transformationen identifiziert. Parallel dazu wird eine Literaturrecherche durchgeführt, um bestehende Ansätze zur Verarbeitung und Strukturierung unstrukturierter Daten sowie den Einsatz von Large Language Models (LLMs) in vergleichbaren Kontexten zu untersuchen.
 
-Begründung der Methodenwahl:
-[Hier kurz erläutern, warum die gewählte Methodik geeignet ist.]
+Aufbauend auf diesen Erkenntnissen wird ein LLM-basierter Ansatz zur Transformation unstrukturierter Produktdaten entwickelt. Dieser umfasst die Konzeption geeigneter Prompts, die Definition von Mapping-Strategien zwischen Eingabedaten und Zielschema sowie die Implementierung eines prototypischen Systems zur automatisierten Datenüberführung.
+
+Ergänzend wird ein regelbasierter Ansatz für ein ausgewähltes Referenzdatenfeld implementiert. Dieser dient als Baseline und ermöglicht einen direkten Vergleich zwischen klassischen deterministischen Verfahren und dem LLM-basierten Ansatz.
+
+Zur Bewertung der Ansätze wird ein geeigneter Datensatz definiert, der als Referenz (Ground Truth) für die Evaluation dient. Auf dieser Basis erfolgt eine quantitative Analyse anhand definierter Key Performance Indicators (KPIs). Dazu zählen insbesondere die Schema-Konformität der erzeugten Daten, die Vollständigkeit der Abbildung sowie die Genauigkeit der Extraktion für das Referenzdatenfeld. Ergänzend werden Effizienzaspekte wie Laufzeit und Verarbeitungskosten betrachtet.
+
+Die Evaluation erfolgt durch einen systematischen Vergleich der Ergebnisse beider Ansätze. Dabei werden sowohl die Qualität der erzeugten Daten als auch die Robustheit gegenüber variierenden Eingabeformaten analysiert. Abschließend werden die Ergebnisse interpretiert und hinsichtlich ihrer praktischen Einsetzbarkeit sowie ihrer Übertragbarkeit auf vergleichbare Anwendungsfälle bewertet.
