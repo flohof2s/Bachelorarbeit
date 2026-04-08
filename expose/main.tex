@@ -1,6 +1,50 @@
-\documentclass{article}
-\usepackage[ngerman]{babel}
+\documentclass[
+  11pt,
+  a4paper,
+  oneside,
+  titlepage,
+  numbers=noenddot
+]{scrartcl}
+
+\input{preamble}
+
+\title{Arbeitstitel des Exposés}
+\subtitle{Präziser Untertitel der geplanten Bachelorarbeit}
+\author{Vorname Nachname\\Matrikelnummer: 1234567}
+\date{\today}
+
 \begin{document}
-Hallo Welt123!as
-\input{chapters/einleitung.tex}
+
+\maketitle
+\tableofcontents
+\clearpage
+
+\section{Problemstellung}
+\input{chapters/01_problemstellung}
+
+\section{Fragestellungen}
+\input{chapters/02_fragestellungen}
+
+\section{Zielsetzung}
+\input{chapters/03_zielsetzung}
+
+\section{Grundlagen und Forschungsstand}
+\input{chapters/04_forschungsstand}
+
+\section{Methodik}
+\input{chapters/05_methodik}
+
+\section{Evaluierungsstrategie}
+\input{chapters/06_evaluierungsstrategie}
+
+\section{Kontext}
+\input{chapters/07_kontext}
+
+\appendix
+\section{Vorläufiger Gliederungsentwurf der Thesis}
+\input{chapters/anhang}
+
+\section{Vorläufiges Literaturverzeichnis}
+\printbibliography
+
 \end{document}

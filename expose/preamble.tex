@@ -1,0 +1,99 @@
+% -----------------------------
+% Sprache, Kodierung, Typografie
+% -----------------------------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage{csquotes}
+\usepackage{microtype}
+
+% -----------------------------
+% Seitenlayout
+% -----------------------------
+\usepackage[
+  a4paper,
+  left=3cm,
+  right=2.5cm,
+  top=2.5cm,
+  bottom=2.5cm
+]{geometry}
+
+% -----------------------------
+% Absatz- und Zeilenlayout
+% -----------------------------
+\usepackage{setspace}
+\setstretch{1.15}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
+
+% -----------------------------
+% Grafiken, Tabellen, Listen
+% -----------------------------
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\setlist{itemsep=0.25em, topsep=0.4em}
+
+% -----------------------------
+% Mathe / Symbole (optional)
+% -----------------------------
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+% -----------------------------
+% Links
+% -----------------------------
+\usepackage[hidelinks]{hyperref}
+\usepackage[nameinlink,noabbrev]{cleveref}
+
+% -----------------------------
+% Abbildungs- und Tabellenbeschriftungen
+% -----------------------------
+\usepackage[
+  font=small,
+  labelfont=bf
+]{caption}
+
+% -----------------------------
+% Literaturverwaltung
+% Kein IEEE-/Nummern-Stil, sondern Autor-Jahr
+% -----------------------------
+\usepackage[
+  backend=biber,
+  style=authoryear,
+  citestyle=authoryear,
+  sorting=nyt,
+  maxcitenames=2,
+  maxbibnames=99,
+  giveninits=true,
+  uniquename=init,
+  doi=false,
+  isbn=false,
+  url=true,
+  eprint=false
+]{biblatex}
+\addbibresource{bibliography.bib}
+
+% Deutsche Bezeichnungen
+\DefineBibliographyStrings{ngerman}{
+  andothers = {et al.}
+}
+
+% -----------------------------
+% KOMA-Script Feineinstellungen
+% -----------------------------
+\KOMAoptions{
+  parskip=half,
+  headings=normal
+}
+
+% -----------------------------
+% PDF-Metadaten
+% -----------------------------
+\hypersetup{
+  pdftitle={Exposé Bachelorarbeit},
+  pdfauthor={Vorname Nachname},
+  pdfsubject={Exposé},
+  pdfcreator={LaTeX}
+}
