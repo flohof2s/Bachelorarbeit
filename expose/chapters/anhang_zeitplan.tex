@@ -1,0 +1,104 @@
+\documentclass[
+  11pt,
+  a4paper,
+  landscape,
+  oneside,
+  DIV=last
+]{scrartcl}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage{microtype}
+\usepackage[scaled]{helvet}
+\usepackage{pgfgantt}
+\usepackage{graphicx}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usepackage[
+  left=0.8cm,
+  right=0.8cm,
+  top=0.8cm,
+  bottom=0.8cm,
+  footskip=0.4cm
+]{geometry}
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage[hidelinks]{hyperref}
+
+\begin{document}
+\pagestyle{plain}
+\setcounter{page}{7}
+
+\section*{B Vorläufiger Zeit- und Aufgabenplan}
+
+\begin{center}
+\resizebox{\textwidth}{!}{%
+\begin{ganttchart}[
+        x unit=0.18cm,
+        y unit chart=0.95cm,
+        vgrid,
+        hgrid,
+        time slot format=isodate,
+        bar height=0.65,
+        group height=0.78,
+        milestone height=0.50,
+        bar label node/.append style={
+            align=right,
+            font=\normalsize,
+            anchor=east,
+            xshift=-5pt,
+            text width=5.8cm
+        },
+        group label node/.append style={
+            align=right,
+            font=\normalsize\bfseries,
+            anchor=east,
+            xshift=-5pt,
+            text width=5.8cm
+        },
+        milestone label node/.append style={
+            align=right,
+            font=\normalsize\itshape,
+            anchor=east,
+            xshift=-5pt,
+            text width=5.8cm
+        },
+        title label font=\small,
+        title/.style={fill=lightgray!50, draw=black, font=\small\bfseries},
+        bar/.style={fill=blue!40},
+        milestone/.style={fill=red, draw=red},
+        group/.style={fill=black, draw=black},
+        progress label text={},
+        calendar week text={\footnotesize \currentweek}
+    ]{2026-05-01}{2026-09-08}
+
+        \gantttitlecalendar{month=shortname, week} \\
+
+        \ganttgroup{Vorbereitung \& Analyse}{2026-05-01}{2026-05-24} \\
+        \ganttbar{Literaturrecherche}{2026-05-01}{2026-05-20} \\
+        \ganttbar{Anforderungsanalyse (DB-Schema)}{2026-05-10}{2026-05-24} \\
+
+        \ganttgroup{Konzeption \& Umsetzung}{2026-05-25}{2026-07-12} \\
+        \ganttbar{LLM Prompt Engineering}{2026-05-25}{2026-06-14} \\
+        \ganttbar{Regelbasierter Ansatz}{2026-06-15}{2026-06-28} \\
+        \ganttbar{Prototyp-Entwicklung}{2026-06-22}{2026-07-12} \\
+        \ganttmilestone{System bereit}{2026-07-12} \\
+
+        \ganttgroup{Evaluation}{2026-07-13}{2026-08-02} \\
+        \ganttbar{Datenauswertung \& KPIs}{2026-07-13}{2026-07-26} \\
+        \ganttbar{Ergebnisinterpretation}{2026-07-27}{2026-08-02} \\
+
+        \ganttgroup{Schreibphase}{2026-05-01}{2026-08-20} \\
+        \ganttbar{Kapitel 1--4 (begleitend)}{2026-05-15}{2026-07-15} \\
+        \ganttbar{Kapitel 5--7 \& Korrekturen}{2026-07-16}{2026-08-20} \\
+
+        \ganttmilestone{Abgabe Thesis}{2026-08-24} \\
+        \ganttmilestone{Kolloquium}{2026-09-07}
+
+\end{ganttchart}%
+}
+\end{center}
+
+\end{document}
