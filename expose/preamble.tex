@@ -6,23 +6,27 @@
 \usepackage[ngerman]{babel}
 \usepackage{csquotes}
 \usepackage{microtype}
+\usepackage[scaled]{helvet}
+\renewcommand{\familydefault}{\sfdefault}
 
 % -----------------------------
 % Seitenlayout
 % -----------------------------
 \usepackage[
   a4paper,
-  left=3cm,
-  right=2.5cm,
-  top=2.5cm,
-  bottom=2.5cm
+  left=4.0cm,   % Vorgabe [cite: 721]
+  right=2.0cm,  % Vorgabe [cite: 722]
+  top=2.5cm,    % Vorgabe [cite: 723]
+  bottom=1.0cm, % Strikte Vorgabe [cite: 724]
+  footskip=0.5cm, % Schiebt die Seitenzahl höher, damit sie bei 1cm Rand sichtbar bleibt
+  includeheadfoot=false % Stellt sicher, dass die Ränder ab Blattkante gerechnet werden
 ]{geometry}
 
 % -----------------------------
 % Absatz- und Zeilenlayout
 % -----------------------------
 \usepackage{setspace}
-\setstretch{1.15}
+\setstretch{1.0}
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{0.6em}
 
@@ -36,7 +40,7 @@
 \setlist{itemsep=0.25em, topsep=0.4em}
 
 % -----------------------------
-% Mathe / Symbole (optional)
+% Mathe / Symbole
 % -----------------------------
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -51,13 +55,12 @@
 % Abbildungs- und Tabellenbeschriftungen
 % -----------------------------
 \usepackage[
-  font=small,
+  font={small,stretch=1.0},
   labelfont=bf
 ]{caption}
 
 % -----------------------------
 % Literaturverwaltung
-% Kein IEEE-/Nummern-Stil, sondern Autor-Jahr
 % -----------------------------
 \usepackage[
   backend=biber,
@@ -75,13 +78,12 @@
 ]{biblatex}
 \addbibresource{bibliography.bib}
 
-% Deutsche Bezeichnungen
 \DefineBibliographyStrings{ngerman}{
   andothers = {et al.}
 }
 
 % -----------------------------
-% KOMA-Script Feineinstellungen
+% KOMA-Script
 % -----------------------------
 \KOMAoptions{
   parskip=half,
@@ -97,3 +99,24 @@
   pdfsubject={Exposé},
   pdfcreator={LaTeX}
 }
+
+% -----------------------------
+% Gantt / Querformat
+% -----------------------------
+\usepackage{pgfgantt}
+\usepackage{pdflscape}
+
+% -----------------------------
+% Seitenkopf und -fuß (Seitenzahlen)
+% -----------------------------
+\usepackage[automark]{scrlayer-scrpage}
+\clearpairofpagestyles
+\cfoot[\pagemark]{\pagemark} % Seitenzahl unten mittig
+\setkomafont{pagenumber}{\normalfont\sffamily} % Seitenzahl in Arial/Helvetika
+
+% Titel in Anführungszeichen setzen 
+\DeclareFieldFormat[article,book,misc]{title}{„#1“}
+
+% Zeilenumbruch nach dem Autor/Jahr für bessere Lesbarkeit 
+\DeclareNameAlias{sortname}{family-given}
+\renewcommand{\labelnamepunct}{\newline}

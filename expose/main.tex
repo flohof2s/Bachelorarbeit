@@ -8,16 +8,56 @@
 
 \input{preamble}
 
-\title{Arbeitstitel des Exposés}
-\subtitle{Präziser Untertitel der geplanten Bachelorarbeit}
-\author{Vorname Nachname\\Matrikelnummer: 1234567}
-\date{\today}
-
 \begin{document}
 
-\maketitle
+% --- Frontmatter (Römische Nummerierung) ---
+\pagenumbering{roman} 
+\pagestyle{plain}
+
+\begin{titlepage}
+    \centering
+
+    % Logo oben
+    \includegraphics[width=0.4\textwidth]{figures/uni_logo.png}\par
+    \vspace{1.5cm}
+
+    {\scshape\LARGE Hochschule Bonn-Rhein-Sieg \par}
+    \vspace{0.5cm}
+    {\scshape\Large Fachbereich Informatik \par}
+    \vspace{2cm}
+
+    {\huge\bfseries Exposé zur Bachelorarbeit \par}
+    \vspace{1.5cm}
+
+    {\LARGE\bfseries Automatisierte Transformation unstrukturierter Produktdaten mittels großer Sprachmodelle \par}
+    \vspace{0.5cm}
+    {\large Konzeption, Implementierung und Evaluation eines auf Sprachmodellen basierenden Ansatzes im Vergleich zu regelbasierten Verfahren \par}
+
+    \vfill
+
+    \begin{flushleft}
+    \large
+    \textbf{Autor:} Vorname Nachname \\
+    \textbf{Matrikelnummer:} 9051803 \\
+    \textbf{Unternehmen:} snoopmedia \\
+    \textbf{Bearbeitungszeitraum:} Mai 2026 -- August 2026 \\
+    \textbf{Betreuer:} Prof. Dr. Sascha Alda \\
+    \textbf{Zweitprüfer:} [Name Zweitprüfer]
+    \end{flushleft}
+
+    \vfill
+
+    {\large \today \par}
+
+\end{titlepage}
+
+% Das Inhaltsverzeichnis folgt auf das Titelblatt (Seite ii)
 \tableofcontents
 \clearpage
+
+% --- Mainmatter (Arabische Nummerierung) ---
+\pagenumbering{arabic} % Startet die Zählung bei 1
+\setcounter{page}{1}   % Stellt sicher, dass die Problemstellung Seite 1 ist
 
 \section{Problemstellung}
 \input{chapters/01_problemstellung}
@@ -40,11 +80,14 @@
 \section{Kontext}
 \input{chapters/07_kontext}
 
+% --- Appendix ---
+% Hinweis: Laut Richtlinie 3.2 laufen arabische Ziffern im Anhang meist weiter.
 \appendix
 \section{Vorläufiger Gliederungsentwurf der Thesis}
 \input{chapters/anhang}
 
 \section{Vorläufiges Literaturverzeichnis}
+% Literaturverzeichnis wird nach Richtlinie 3.2 ebenfalls arabisch weitergezählt
 \printbibliography
 
 \end{document}
