@@ -1,0 +1,92 @@
+\documentclass[
+  11pt,
+  a4paper,
+  oneside,
+  titlepage,
+  numbers=noenddot
+]{scrartcl}
+
+\input{preamble}
+
+\begin{document}
+
+% --- Frontmatter (Römische Nummerierung) ---
+\pagenumbering{roman} 
+\pagestyle{plain}
+
+\begin{titlepage}
+    \centering
+
+    % Logo oben
+    \includegraphics[width=0.4\textwidth]{figures/uni_logo.png}\par
+    \vspace{1.5cm}
+
+    {\scshape\LARGE Hochschule Bonn-Rhein-Sieg \par}
+    \vspace{0.5cm}
+    {\scshape\Large Fachbereich Informatik \par}
+    \vspace{2cm}
+
+    {\huge\bfseries Praxisprojekt \par}
+    \vspace{1.5cm}
+
+    {\LARGE\bfseries Automatisierte Transformation unstrukturierter Produktdaten mittels großer Sprachmodelle \par}
+    \vspace{0.5cm}
+    {\large Konzeption, Implementierung und Evaluation eines auf Sprachmodellen basierenden Ansatzes im Vergleich zu regelbasierten Verfahren \par}
+
+    \vfill
+
+    \begin{flushleft}
+    \large
+    \textbf{Autor:} Fabian Lohoff \\
+    \textbf{Matrikelnummer:} 9051803 \\
+    \textbf{Unternehmen:} snoopmedia GmbH \\
+    \textbf{Bearbeitungszeitraum:} Februar 2026 -- April 2026 \\
+    \textbf{Betreuer:} TODO \\
+    \textbf{Fachlicher Betreuer:} Ronald Brenner
+    \end{flushleft}
+
+    \vfill
+
+    {\large \today \par}
+
+\end{titlepage}
+
+% Das Inhaltsverzeichnis folgt auf das Titelblatt (Seite ii)
+\tableofcontents
+\clearpage
+
+% --- Mainmatter (Arabische Nummerierung) ---
+\pagenumbering{arabic} % Startet die Zählung bei 1
+\setcounter{page}{1}   % Stellt sicher, dass die Problemstellung Seite 1 ist
+
+\section{Der Weg zum Unternehmen}
+\input{chapters/01_weg_zum_unternehmen.tex}
+
+\section{Das Unternehmen}
+\input{chapters/02_das_unternehmen.tex}
+
+\section{Beschreibung der Aufgabenstellung}
+\input{chapters/03_beschreibung_der_aufgabe.tex}
+
+\section{Beschreibung der Umsetzung}
+\input{chapters/04_beschreibung_der_umsetzung.tex}
+
+\section{Bezug zum bisherigen Studiu,}
+\input{chapters/05_bezug_zum_studium.tex}
+
+\section{Fachliche und persönliche Erfahrungen}
+\input{chapters/06_erfahrungen.tex}
+
+
+% --- Appendix ---
+% Hinweis: Laut Richtlinie 3.2 laufen arabische Ziffern im Anhang meist weiter.
+\clearpage
+\appendix
+\section{Vorläufiger Gliederungsentwurf der Thesis}
+\input{chapters/anhang}
+
+\section{Vorläufiges Literaturverzeichnis}
+% Literaturverzeichnis wird nach Richtlinie 3.2 ebenfalls arabisch weitergezählt
+\printbibliography
+
+\end{document}
