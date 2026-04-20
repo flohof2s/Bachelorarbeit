@@ -27,7 +27,6 @@
 % -----------------------------
 \usepackage{setspace}
 \setstretch{1.0}
-\setlength{\parindent}{0pt}
 \setlength{\parskip}{0.6em}
 
 % -----------------------------
@@ -89,6 +88,14 @@
   parskip=half,
   headings=normal
 }
+
+% -----------------------------
+% Manuelle Anpassung der Überschriften gemäß Vorgabe 
+% -----------------------------
+\setkomafont{section}{\fontsize{12bp}{14.4bp}\selectfont\bfseries}       % Ebene 1: 12pt fett 
+\setkomafont{subsection}{\fontsize{11bp}{13.2bp}\selectfont\bfseries}    % Ebene 2: 11pt fett 
+\setkomafont{subsubsection}{\fontsize{11bp}{13.2bp}\selectfont\bfseries} % Ebene 3: 11pt fett 
+\setkomafont{paragraph}{\fontsize{11bp}{13.2bp}\selectfont\bfseries}     % Ebene 4: 11pt fett
 
 % -----------------------------
 % PDF-Metadaten
