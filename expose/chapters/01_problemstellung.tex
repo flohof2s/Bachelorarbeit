@@ -1,14 +1,25 @@
-% Leitfragen laut Vorgabe:
-% - Was ist die grundlegende Motivation?
-% - Welches relevante Problem ist Ausgangspunkt?
-% - Warum ist es ein Problem?
-% - Welche Relevanz hat es?
-% - Warum ist es lohnenswert, diesem Problem nachzugehen?
-% - Wie kommt es zu dem Thema?
-% - Welche Herausforderungen bestehen?
 
-Die zunehmende Digitalisierung und Automatisierung von Geschäftsprozessen führt dazu, dass Unternehmen in großem Umfang Produktdaten aus unterschiedlichen Quellen erfassen und verarbeiten. Insbesondere im Kontext von Web-Crawling entstehen dabei häufig große Mengen an unstrukturierten oder nur schwach strukturierten Textdaten, die für eine Weiterverarbeitung in Informationssystemen zunächst in eine definierte Datenstruktur überführt werden müssen.
+Die zunehmende Digitalisierung und Automatisierung von Geschäftsprozessen führt dazu, dass Unternehmen in großem Umfang Produktdaten aus unterschiedlichen Quellen erfassen und verarbeiten. 
+Insbesondere im Kontext von Web-Crawling entstehen dabei häufig große Mengen an unstrukturierten oder nur schwach strukturierten Textdaten, die für eine Weiterverarbeitung in 
+Informationssystemen zunächst in eine definierte Datenstruktur überführt werden müssen.
 
-Ein zentrales Problem besteht darin, dass diese Rohdaten in der Regel nicht den Anforderungen bestehender Datenbankschemata entsprechen. Die Transformation solcher formlosen Produktinformationen in eine strukturierte und schema-konforme Form erfolgt häufig mittels regelbasierter Ansätze. Diese sind jedoch anfällig gegenüber variierenden Schreibweisen, uneinheitlichen Formaten sowie semantischen Unterschieden und stoßen insbesondere bei heterogenen Datenquellen schnell an ihre Grenzen. Gleichzeitig eröffnen Large Language Models (LLMs) neue Möglichkeiten zur semantischen Interpretation und Strukturierung unstrukturierter Daten. Allerdings ist bislang unklar, inwieweit solche Modelle zuverlässig und konsistent in der Lage sind, komplexe Datenstrukturen vollständig und korrekt abzubilden.
+Ein zentrales Problem besteht darin, dass diese Rohdaten in der Regel nicht den Anforderungen bestehender Datenbankschemata entsprechen. Dies ist primär auf eine mangelnde 
+Standardisierung zurückzuführen. Dies ist eine der Kernherausforderungen innerhalb der Datenintegration \parencite[vgl.][S. 1--15]{doan2012principles}. 
+Zwar existieren mit Initiativen wie schema.org fundierte Ansätze, um einen generischen Standard für die semantische Auszeichnung von Webinhalten zu 
+etablieren \parencite[vgl.][S. 44]{guha2016schema}, jedoch findet dieser in der Praxis noch keine flächendeckende Anwendung. Infolgedessen bleibt eine signifikante Heterogenität 
+der Datenquellen bestehen, welche die nahtlose Integration in Informationssysteme erschwert \parencite[vgl.][S. 1]{meusel2015web}.
 
-Die Relevanz dieses Problems ergibt sich aus der zentralen Rolle strukturierter Daten für nachgelagerte Prozesse wie Analyse, Suche oder Integration in bestehende Systeme. Eine fehlerhafte oder inkonsistente Datenüberführung kann zu erheblichen Qualitätseinbußen und ineffizienten Prozessen führen. Vor diesem Hintergrund stellt sich die Herausforderung, einen Ansatz zu entwickeln, der sowohl die Flexibilität semantischer Modelle nutzt als auch die Anforderungen an Schema-Konformität und Datenqualität erfüllt. Zudem ist zu untersuchen, wie sich ein solcher Ansatz im Vergleich zu klassischen regelbasierten Verfahren verhält und unter welchen Bedingungen ein praktischer Einsatz sinnvoll ist.
+Die Transformation solcher formlosen Produktinformationen in eine strukturierte und schema-konforme Form erfolgt häufig mittels regelbasierter Ansätze. In der Literatur 
+werden diese oft als Wrapper bezeichnet, die auf spezifische Muster oder Heuristiken angewiesen sind \parencite[vgl.][S. 9]{ferrara2014web}. Diese Verfahren erweisen sich 
+jedoch als äußerst fragil gegenüber variierenden Schreibweisen, uneinheitlichen Formaten sowie semantischen Unterschieden \parencite[vgl.][S. 12]{ferrara2014web}. 
+Insbesondere bei heterogenen Datenquellen stoßen sie an ihre Grenzen, da jede strukturelle Abweichung der Quelle eine manuelle Anpassung der Extraktionsregeln erfordert, 
+was in der Praxis zu einem kaum noch zu bewältigenden Wartungsaufwand führt \parencite[vgl.][S. 14]{ferrara2014web}.
+
+Gleichzeitig eröffnen LLMs neue Möglichkeiten zur semantischen Interpretation und Strukturierung unstrukturierter Daten. Allerdings ist bislang unklar, 
+inwieweit solche Modelle zuverlässig und konsistent in der Lage sind, komplexe Datenstrukturen vollständig und korrekt abzubilden. Die Relevanz dieses Problems ergibt sich aus der 
+zentralen Rolle strukturierter Daten für nachgelagerte Prozesse wie Analyse, Suche oder Integration in bestehende Systeme. Eine fehlerhafte oder inkonsistente Datenüberführung 
+kann zu erheblichen Qualitätseinbußen und ineffizienten Prozessen führen. 
+
+Vor diesem Hintergrund stellt sich die Herausforderung, einen Ansatz zu entwickeln, der sowohl die 
+Flexibilität semantischer Modelle nutzt als auch die Anforderungen an Schema-Konformität und Datenqualität erfüllt. Zudem ist zu untersuchen, 
+wie sich ein solcher Ansatz im Vergleich zu klassischen regelbasierten Verfahren verhält und unter welchen Bedingungen ein praktischer Einsatz sinnvoll ist.
