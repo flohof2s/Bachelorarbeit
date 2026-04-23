@@ -61,20 +61,16 @@
 % -----------------------------
 % Literaturverwaltung
 % -----------------------------
+
 \usepackage[
   backend=biber,
-  style=authoryear,
-  citestyle=authoryear,
-  sorting=nyt,
-  maxcitenames=2,
-  maxbibnames=99,
-  giveninits=true,
-  uniquename=init,
-  doi=false,
+  style=numeric,
+  sorting=none,
   isbn=false,
-  url=true,
-  eprint=false
+  doi=false,
+  url=true
 ]{biblatex}
+
 \addbibresource{bibliography.bib}
 
 \DefineBibliographyStrings{ngerman}{
@@ -121,9 +117,4 @@
 \cfoot[\pagemark]{\pagemark} % Seitenzahl unten mittig
 \setkomafont{pagenumber}{\normalfont\sffamily} % Seitenzahl in Arial/Helvetika
 
-% Titel in Anführungszeichen setzen 
-\DeclareFieldFormat[article,book,misc]{title}{„#1“}
-
-% Zeilenumbruch nach dem Autor/Jahr für bessere Lesbarkeit 
-\DeclareNameAlias{sortname}{family-given}
-\renewcommand{\labelnamepunct}{\newline}
+\DeclareFieldFormat[article,book,misc,online]{title}{„#1“}

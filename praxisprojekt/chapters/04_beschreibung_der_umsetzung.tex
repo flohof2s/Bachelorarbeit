@@ -4,7 +4,8 @@ im Backend sowie einer mobilen Applikation auf Basis von Vue.js und TypeScript.
 \subsection{Erweiterung der Backend-Infrastruktur (API)}
 
 Ein zentraler Aspekt der technischen Umsetzung war die Erweiterung des bestehenden Datenmodells, um die komplexen Anforderungen des Gamification-Konzepts abzubilden. Ziel der 
-Architektur war eine strikte Trennung zwischen Datenhaltung und Präsentation (Separation of Concerns). Während die Applikation die Logik zum Rendern der Spielwelt enthält, 
+Architektur war eine strikte Trennung zwischen Datenhaltung und Präsentation im Sinne der \textit{Separation of Concerns}, um eine nachhaltige Wartbarkeit zu gewährleisten 
+\cite{Martin2017}. Während die Applikation die Logik zum Rendern der Spielwelt enthält, 
 werden sämtliche inhaltlichen und strukturellen Informationen dynamisch über die API bezogen. Dies ermöglicht es, neue Lerninhalte zu pflegen, ohne ein Update der App-Software
  durchführen zu müssen.
 
@@ -43,7 +44,7 @@ die Interaktion zwischen der App, dem Identity Service und den externen Firebase
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.8\textwidth]{figures/RuntimeDiagramLogin.pdf}
+    \includegraphics[width=0.95\textwidth]{figures/RuntimeDiagramLogin.png}
     \caption{Runtime-Diagramm des Authentifizierungsprozesses via Firebase}
     \label{fig:runtime_login}
 \end{figure}
@@ -140,7 +141,7 @@ automatisch visuell umsetzen:
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.85\textwidth]{figures/ClassDiagram_Entities.png}
+    \includegraphics[width=0.85\textwidth]{figures/ClassDiagram_Entity.png}
     \caption{Entity-System und Spezialisierung der generischen Szenentypen}
     \label{fig:engine_entities}
 \end{figure}
