@@ -19,17 +19,17 @@ werden sämtliche inhaltlichen und strukturellen Informationen dynamisch über d
 Um die Anforderungen der TU München technisch umzusetzen, wurden sechs zentrale Tabellen in das bestehende Schema integriert (siehe Abbildung \ref{fig:er_schema}):
 
 \begin{itemize}
-    \item \textbf{world \& scene:} Diese Tabellen bilden die topografische Hierarchie ab. Analog zu Videospiel-Klassikern wie „Super Mario Bros.“ ist das System auf Skalierbarkeit 
+    \item \textit{world \& scene:} Diese Tabellen bilden die topografische Hierarchie ab. Analog zu Videospiel-Klassikern wie „Super Mario Bros.“ ist das System auf Skalierbarkeit 
     ausgelegt: Eine Welt fungiert als Container für thematisch zusammenhängende Szenen (z. B. „Lissabon“ oder „Cyber-City“), die wiederum den narrativen Rahmen für die Lerninhalte 
     vorgeben.
-    \item \textbf{learning\_units:} Hier werden die eigentlichen didaktischen Einheiten verwaltet. Durch die Verknüpfung mit Szenen signalisiert die API der App, welche Lerninhalte 
+    \item \textit{learning\_units:} Hier werden die eigentlichen didaktischen Einheiten verwaltet. Durch die Verknüpfung mit Szenen signalisiert die API der App, welche Lerninhalte 
     an welchem Ort der grafischen Spielwelt aktiv sind.
-    \item \textbf{learning\_unit\_requirement:} Zur Steuerung des Lernpfads wurde eine Abhängigkeitslogik implementiert. Diese Tabelle definiert Voraussetzungen (Prerequisites), sodass 
+    \item \textit{learning\_unit\_requirement:} Zur Steuerung des Lernpfads wurde eine Abhängigkeitslogik implementiert. Diese Tabelle definiert Voraussetzungen (Prerequisites), sodass 
     bestimmte Einheiten erst nach dem erfolgreichen Abschluss vorangegangener Aufgaben freigeschaltet werden.
-    \item \textbf{content:} Um eine maximale Flexibilität zu gewährleisten, wurde die Content-Tabelle hochgradig abstrakt entworfen. Sie speichert unterschiedliche Datentypen. Von URLs 
+    \item \textit{content:} Um eine maximale Flexibilität zu gewährleisten, wurde die Content-Tabelle hochgradig abstrakt entworfen. Sie speichert unterschiedliche Datentypen. Von URLs 
     für Bild-Assets der Comic-Szenen bis hin zu JSON-strukturierten Inhalten für Formulare. Die App fungiert hierbei lediglich als „Renderer“, der die Daten gemäß 
     ihrem Typ interpretiert.
-    \item \textbf{user\_progress:} Diese Tabelle persisitiert den individuellen Fortschritt der Nutzer. Sie bildet die Grundlage für das serverseitige Belohnungssystem und stellt sicher,
+    \item \textit{user\_progress:} Diese Tabelle persisitiert den individuellen Fortschritt der Nutzer. Sie bildet die Grundlage für das serverseitige Belohnungssystem und stellt sicher,
      dass der Spielstatus geräteübergreifend synchron bleibt.
 \end{itemize}
 
@@ -38,7 +38,7 @@ Fortschritten typsicher abgebildet werden. Auf Basis des aktualisierten Schemas 
 Service-Klassen für die Business-Logik und REST-Controller für die Bereitstellung der Endpunkte, entwickelt.
 
 Ein wesentlicher Bestandteil der API-Architektur ist das Sicherheits- und Authentifizierungskonzept. Die gesamte Benutzerverwaltung sowie der Login-Mechanismus werden über 
-\textbf{Firebase} realisiert. Zur Absicherung der Kommunikation wird bei jedem API-Aufruf ein von Firebase generierter User-Token im Header mitgeschickt. Dieser wird serverseitig 
+\textit{Firebase} \cite{Firebase} realisiert. Zur Absicherung der Kommunikation wird bei jedem API-Aufruf ein von Firebase generierter User-Token im Header mitgeschickt. Dieser wird serverseitig 
 validiert, um sicherzustellen, dass nur authentifizierte Nutzer Zugriff auf ihre Fortschrittsdaten haben. Die Abbildung \ref{fig:runtime_login} verdeutlicht diesen Prozess sowie 
 die Interaktion zwischen der App, dem Identity Service und den externen Firebase-Schnittstellen während des Anmeldevorgangs.
 
@@ -56,8 +56,8 @@ Status („Single Source of Truth“) im Backend verbleibt.
 \subsection{Integration der Gamification-Schnittstellen in der App}
 
 Nach der Bereitstellung der Datenstrukturen im Backend erfolgte die clientseitige Integration in die mobile Applikation. Diese basiert technologisch auf dem Framework 
-\textbf{Vue.js} in Kombination mit dem Build-Tool \textbf{Vite}. Um eine hohe Typsicherheit und Wartbarkeit innerhalb der heterogenen Datenstrukturen des Projekts zu gewährleisten, 
-wurde die gesamte Geschäftslogik konsequent in \textbf{TypeScript} umgesetzt.
+\textit{Vue.js} in Kombination mit dem Build-Tool \textit{Vite}. Um eine hohe Typsicherheit und Wartbarkeit innerhalb der heterogenen Datenstrukturen des Projekts zu gewährleisten, 
+wurde die gesamte Geschäftslogik konsequent in \textit{TypeScript} umgesetzt.
 
 \subsubsection{Datenmodellierung und Service-Layer}
 Die Repräsentation der Backend-Entitäten erfolgt in der App über TypeScript-Interfaces (z. B. \texttt{ILearningUnit}). Diese dienen als Kontrakte für die Datenstrukturen und stellen 
@@ -93,7 +93,7 @@ Der Service implementiert zudem die komplexen Filter- und Statuslogiken, die fü
 
 Besonderes Augenmerk wurde auf die Auflösung der Abhängigkeiten gelegt. Die Methode \texttt{mapRequirements} transformiert die relationalen Verknüpfungen aus der Datenbank 
 (z. B. welche Einheit welche andere freischaltet) in einfache Arrays von Identifikatoren. Dies entlastet die UI-Komponenten von komplexen Logikoperationen und ermöglicht eine 
-performante Prüfung des Freischaltstatus innerhalb der App-Oberfläche. Durch die Einbindung der \textbf{EndpointGroups} wird zudem sichergestellt, dass die API nur die für den 
+performante Prüfung des Freischaltstatus innerhalb der App-Oberfläche. Durch die Einbindung der \textit{EndpointGroups} wird zudem sichergestellt, dass die API nur die für den 
 jeweiligen Kontext notwendigen Datenfelder liefert, was die Netzwerklast minimiert und die Performance der mobilen Anwendung optimiert.
 
 \subsection{Entwicklung einer leichtgewichtigen Game-Engine}
@@ -116,11 +116,11 @@ Die Integration in die App erfolgt über Vue-Komponenten wie die \texttt{Learnin
 via API geladen und die Engine initialisiert. Eine \texttt{LearningUnit} folgt dabei einer festen didaktischen Struktur, die im Konzept der TU München definiert wurde:
 
 \begin{itemize}
-    \item \textbf{Opening:} Einstieg in die Thematik.
-    \item \textbf{Problem:} Visualisierung der Risiken.
-    \item \textbf{Learning:} Vermittlung von Fachwissen durch Learning Nuggets.
-    \item \textbf{Action:} Durchführung einer interaktiven Challenge.
-    \item \textbf{Reward:} Abschluss und Belohnung.
+    \item \textit{Opening:} Einstieg in die Thematik.
+    \item \textit{Problem:} Visualisierung der Risiken.
+    \item \textit{Learning:} Vermittlung von Fachwissen durch Learning Nuggets.
+    \item \textit{Action:} Durchführung einer interaktiven Challenge.
+    \item \textit{Reward:} Abschluss und Belohnung.
 \end{itemize}
 
 Diese Phasen werden durch die Engine als verkettete Liste von Szenen-Objekten instanziiert. Jede Szene erhält dabei eine Referenz auf ihren Nachfolger (\texttt{setNext}), um einen
@@ -131,12 +131,12 @@ Um den Implementierungsaufwand für neue Inhalte zu minimieren, wurde das System
 automatisch visuell umsetzen:
 
 \begin{itemize}
-    \item \textbf{SlideshowScene:} Dieser Typ wird für die narrativen Phasen (\textit{Opening, Problem, Learning, Reward}) verwendet. Da diese primär aus Comic-Szenen 
+    \item \textit{SlideshowScene:} Dieser Typ wird für die narrativen Phasen (\textit{Opening, Problem, Learning, Reward}) verwendet. Da diese primär aus Comic-Szenen 
     bestehen, fungiert die Szene als automatisierter Renderer für Bild-Assets. Nutzer können per Interaktion durch die Inhalte navigieren, wobei die Engine die entsprechenden
      Entities (z. B. den Guide oder Hintergrundgrafiken) dynamisch austauscht.
-    \item \textbf{ActionScene:} Diese Szene bildet den interaktiven Kern (Phase \textit{Action}). Sie transformiert die JSON-basierten Challenge-Daten der API automatisch in eine 
-    Multiple-Choice-Aufgabe oder eine spielerische Entscheidungssituation.
-    \item \textbf{RoadmapScene:} Unabhängig von den Lerneinheiten dient dieser Typ zur Darstellung der Weltkarte und ermöglicht den Einstieg in die freigeschalteten Einheiten.
+    \item \textit{ActionScene:} Diese Szene bildet den interaktiven Kern (Phase \textit{Action}). Sie transformiert die JSON-basierten Challenge-Daten der API automatisch in eine 
+    Multiple-Choice-Aufgabe.
+    \item \textit{RoadmapScene:} Unabhängig von den Lerneinheiten dient dieser Typ zur Darstellung der Weltkarte und ermöglicht den Einstieg in die freigeschalteten Einheiten.
 \end{itemize}
 
 \begin{figure}[htbp]
@@ -146,11 +146,21 @@ automatisch visuell umsetzen:
     \label{fig:engine_entities}
 \end{figure}
 
-Die Darstellung erfolgt über ein \textbf{Entity-System}. Jedes grafische Element ist eine Instanz einer \texttt{Entity}-Klasse mit eigenem Lebenszyklus (\texttt{update} und 
-\texttt{render}). Beim Abschluss der finalen \texttt{reward}-Szene wird über ein Callback-System die Methode \texttt{updateCompletedStatus} im Backend aufgerufen, 
-wodurch der Fortschritt persistent gespeichert und die Navigation zurück zur Roadmap eingeleitet wird.
+Die Darstellung innerhalb der Engine erfolgt über ein modular aufgebautes \textit{Entity-System}. Jedes grafische Element ist eine Instanz einer \texttt{Entity}-Klasse 
+mit eigenem Lebenszyklus, welcher primär durch die Methoden \texttt{update} und \texttt{render} definiert wird. 
 
+Ein zentraler Aspekt der Architektur ist die Anwendung des \textit{Composite Patterns}: Durch die strukturelle Trennung in \texttt{Component} und \texttt{Entity} können 
+komplexe Objekte aus wiederverwendbaren Verhaltensbausteinen komponiert werden. Die visuelle Repräsentation wird dabei konsequent über ein dediziertes 
+\texttt{Style}-System gesteuert, welches die Parameter für die \texttt{render}-Methoden liefert und so eine saubere Trennung zwischen Logik und Aussehen erzwingt. Zur 
+Verwaltung dynamischer Zustände verfügt jede Entity über ein internes \texttt{State}-Management, das den aktuellen Status der Einheit persistiert und Zustandsübergänge 
+innerhalb des Spielzyklus ermöglicht.
 
+In der Umsetzung wurde verstärkt auf Konzepte der objektorientierten Programmierung (OOP) gesetzt. So werden durch den Einsatz von \textit{Interfaces} und 
+\textit{abstrakten Klassen} klare Kontrakte für das System definiert. Ein Beispiel hierfür ist das \texttt{InteractiveEntity}, welches als Abstraktionsschicht für alle 
+Objekte dient, die auf Nutzerinteraktionen reagieren können.
+
+Beim Abschluss der finalen \texttt{reward}-Szene wird über ein Callback-System die Methode \texttt{updateCompletedStatus} im Backend aufgerufen, wodurch der Fortschritt 
+persistent gespeichert und die Navigation zurück zur Roadmap eingeleitet wird.
 
 
 \subsection{Projektübergreifende Wartungsarbeiten}
