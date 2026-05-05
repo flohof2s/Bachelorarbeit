@@ -1,23 +1,24 @@
-Zur Überprüfung der Zielerreichung und zur Beantwortung der formulierten Fragestellungen wird eine quantitative Evaluierung der entwickelten Ansätze durchgeführt.
+Zur Überprüfung der Zielerreichung und zur Beantwortung der formulierten Fragestellungen wird eine quantitative Evaluierung der entwickelten Ansätze durchgeführt. 
 
-Grundlage der Evaluation bildet ein Referenzdatensatz (Ground Truth), der strukturierte Zielwerte für ausgewählte Produktdaten enthält. Dieser dient als Vergleichsbasis zur Bewertung der durch die Ansätze erzeugten Ergebnisse.
+Grundlage der Evaluation bildet ein repräsentativer Referenzdatensatz (Ground Truth), der strukturierte Zielwerte für ausgewählte Produktdaten enthält. Auf dieser Basis erfolgt 
+ein systematischer Vergleich beider Ansätze hinsichtlich der Qualität der erzeugten Daten sowie der Robustheit gegenüber variierenden Eingabeformaten.
 
-Die Evaluierung erfolgt anhand definierter KPIs, die sowohl die Qualität als auch die Strukturtreue der erzeugten Daten abbilden. 
-Dabei orientiert sich die Auswahl an etablierten Dimensionen der Datenqualität \parencite[vgl.][S. 5--33]{wang1996beyond}:
+Die Auswertung erfolgt anhand definierter Key Performance Indicators (KPIs), die sowohl die Qualität als auch die Strukturtreue abbilden. Dabei orientiert sich die Auswahl an 
+etablierten Dimensionen der Datenqualität \parencite[vgl.][S. 5--33]{wang1996beyond}:
 
 \begin{itemize}
-    \item \textbf{Schema Compliance Rate:} Anteil der generierten Datensätze, die dem vorgegebenen Datenbankschema entsprechen (Dimension der \textit{Representational Consistency}).
-    \item \textbf{Vollständigkeit (Coverage):} Anteil der korrekt befüllten Datenfelder im Verhältnis zu allen erforderlichen Feldern \parencite[Dimension der \textit{Completeness}, vgl.][S. 24]{batini2016data}.
-    \item \textbf{Konsistenz:} Grad der strukturellen und semantischen Einheitlichkeit der erzeugten Daten. Diese Metrik validiert die Widerspruchsfreiheit innerhalb der extrahierten Datensätze \parencite[vgl.][S. 31]{batini2016data}.
-    \item \textbf{Exact Match Rate:} Strikte Übereinstimmung der generierten Werte mit dem Ground Truth. Diese binäre Metrik wird häufig zur Evaluation von Extraktionsaufgaben in strukturierten Benchmarks herangezogen \parencite[vgl.][S. 1283]{data_extraction_ai}.
-    \item \textbf{Precision, Recall und F1-Score:} Aggregierte Maße der Extraktionsgüte, wobei Precision die Genauigkeit und Recall die Trefferquote beschreibt \parencite[vgl.][S. 67f.]{data_extraction_ai}.
-    \item \textbf{Effizienzmetriken:} Analyse der Verarbeitungszeit und der Kosten, was insbesondere im betrieblichen Kontext von hoher Relevanz ist \parencite[vgl.][S. 3]{ferrara2014web}.
+    \item \textit{Schema Compliance Rate:} Anteil der generierten Datensätze, die dem vorgegebenen Datenbankschema entsprechen (Dimension der 
+    \textit{Representational Consistency}).
+    \item \textit{Vollständigkeit (Coverage):} Anteil der korrekt befüllten Datenfelder im Verhältnis zu allen erforderlichen Feldern 
+    \parencite[Dimension der \textit{Completeness}, vgl.][S. 24]{batini2016data}.
+    \item \textit{Konsistenz:} Grad der strukturellen und semantischen Einheitlichkeit der erzeugten Daten. Diese Metrik validiert die Widerspruchsfreiheit innerhalb der 
+    extrahierten Datensätze \parencite[vgl.][S. 31]{batini2016data}.
+    \item \textit{Exact Match Rate:} Strikte Übereinstimmung der generierten Werte mit dem Ground Truth. Diese binäre Metrik wird häufig zur Evaluation von Extraktionsaufgaben 
+    in strukturierten Benchmarks herangezogen \parencite[vgl.][S. 1283]{data_extraction_ai}.
+    \item \textit{Precision, Recall und F1-Score:} Aggregierte Maße der Extraktionsgüte, wobei Precision die Genauigkeit und Recall die Trefferquote beschreibt 
+    \parencite[vgl.][S. 67f.]{data_extraction_ai}.
+    \item \textit{Effizienzmetriken:} Ergänzend werden Effizienzaspekte wie Laufzeit und Verarbeitungskosten betrachtet, was insbesondere im betrieblichen Kontext von hoher 
+    Relevanz ist \parencite[vgl.][S. 3]{ferrara2014web}.
 \end{itemize}
 
-Zur Vergleichbarkeit wird sowohl der LLM-basierte Ansatz als auch der regelbasierte Ansatz auf denselben Datensatz angewendet. Die Ergebnisse werden anschließend systematisch gegenübergestellt.
-
-Die Auswertung erfolgt in mehreren Schritten: Zunächst werden die einzelnen Metriken berechnet und quantitativ analysiert. Anschließend werden die Ergebnisse interpretiert, um Unterschiede in der Leistungsfähigkeit, Robustheit gegenüber variierenden Eingabeformaten sowie potenzielle Fehlerquellen zu identifizieren.
-
-Darüber hinaus wird untersucht, inwieweit die Ergebnisse auf andere Datensätze oder Anwendungsfälle übertragbar sind. Dabei werden insbesondere die Grenzen des LLM-basierten Ansatzes hinsichtlich Schema-Konformität, Konsistenz und Reproduzierbarkeit berücksichtigt.
-
-Die Evaluierung ermöglicht somit eine fundierte Bewertung der Frage, ob und unter welchen Bedingungen ein LLM-basierter Ansatz gegenüber klassischen regelbasierten Verfahren Vorteile bietet.
+Abschließend werden die Ergebnisse interpretiert und hinsichtlich ihrer praktischen Einsetzbarkeit sowie ihrer Übertragbarkeit auf vergleichbare Anwendungsfälle bewertet.

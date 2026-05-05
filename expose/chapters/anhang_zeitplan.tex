@@ -2,8 +2,7 @@
   11pt,
   a4paper,
   landscape,
-  oneside,
-  DIV=last
+  oneside
 ]{scrartcl}
 
 \usepackage[T1]{fontenc}
@@ -34,6 +33,8 @@
 \section*{B Vorläufiger Zeit- und Aufgabenplan}
 
 \begin{center}
+% Unterdrückt die harmlosen "Underfull \hbox"-Warnungen innerhalb des Gantt-Diagramms
+\hbadness=10000
 \resizebox{\textwidth}{!}{%
 \begin{ganttchart}[
         x unit=0.18cm,
@@ -72,30 +73,30 @@
         group/.style={fill=black, draw=black},
         progress label text={},
         calendar week text={\footnotesize \currentweek}
-    ]{2026-05-01}{2026-09-08}
+    ]{2026-05-11}{2026-09-06}
 
         \gantttitlecalendar{month=shortname, week} \\
 
-        \ganttgroup{Vorbereitung \& Analyse}{2026-05-01}{2026-05-24} \\
-        \ganttbar{Literaturrecherche}{2026-05-01}{2026-05-20} \\
-        \ganttbar{Anforderungsanalyse (DB-Schema)}{2026-05-10}{2026-05-24} \\
+        \ganttgroup{Konzeption \& Vorbereitung}{2026-05-15}{2026-06-04} \\
+        \ganttbar{Literaturrecherche \& Grundlagen}{2026-05-15}{2026-05-28} \\
+        \ganttbar{Anforderungsanalyse \& Architektur}{2026-05-24}{2026-06-04} \\
 
-        \ganttgroup{Konzeption \& Umsetzung}{2026-05-25}{2026-07-12} \\
-        \ganttbar{LLM Prompt Engineering}{2026-05-25}{2026-06-14} \\
-        \ganttbar{Regelbasierter Ansatz}{2026-06-15}{2026-06-28} \\
-        \ganttbar{Prototyp-Entwicklung}{2026-06-22}{2026-07-12} \\
-        \ganttmilestone{System bereit}{2026-07-12} \\
+        \ganttgroup{Implementierung}{2026-06-05}{2026-07-10} \\
+        \ganttbar{LLM-basierter Prototyp}{2026-06-05}{2026-06-25} \\
+        \ganttbar{Regelbasierter Referenzansatz}{2026-06-20}{2026-07-05} \\
+        \ganttbar{Qualitätssicherung}{2026-07-01}{2026-07-10} \\
+        \ganttmilestone{Implementierung abgeschlossen}{2026-07-10} \\
 
-        \ganttgroup{Evaluation}{2026-07-13}{2026-08-02} \\
-        \ganttbar{Datenauswertung \& KPIs}{2026-07-13}{2026-07-26} \\
-        \ganttbar{Ergebnisinterpretation}{2026-07-27}{2026-08-02} \\
+        \ganttgroup{Evaluierung}{2026-07-11}{2026-07-31} \\
+        \ganttbar{Ground Truth \& Testdatensatz}{2026-07-11}{2026-07-18} \\
+        \ganttbar{Ergebnisanalyse \& Vergleich}{2026-07-19}{2026-07-31} \\
 
-        \ganttgroup{Schreibphase}{2026-05-01}{2026-08-20} \\
-        \ganttbar{Kapitel 1--4 (begleitend)}{2026-05-15}{2026-07-15} \\
-        \ganttbar{Kapitel 5--7 \& Korrekturen}{2026-07-16}{2026-08-20} \\
+        \ganttgroup{Schreibphase}{2026-05-20}{2026-08-15} \\
+        \ganttbar{Kapitel 1--3 (begleitend)}{2026-05-20}{2026-06-20} \\
+        \ganttbar{Kapitel 4--6 \& Korrekturen}{2026-07-10}{2026-08-15} \\
 
-        \ganttmilestone{Abgabe Thesis}{2026-08-24} \\
-        \ganttmilestone{Kolloquium}{2026-09-07}
+        \ganttmilestone{Abgabe Thesis}{2026-08-15} \\
+        \ganttmilestone{Kolloquium}{2026-08-29}
 
 \end{ganttchart}%
 }

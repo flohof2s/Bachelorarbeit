@@ -1,11 +1,13 @@
-Zur Beantwortung der formulierten Fragestellungen wird ein kombinierter Ansatz aus konzeptioneller Entwicklung, prototypischer Implementierung sowie quantitativer Evaluation verfolgt.
+Zur Beantwortung der formulierten Fragestellungen wird ein kombinierter Ansatz aus Konzeption, prototypischer Implementierung sowie quantitativer Evaluation verfolgt. Das 
+methodische Vorgehen orientiert sich dabei am Paradigma des Design Science Research, welches die Entwicklung und Evaluation innovativer IT-Artefakte zur Lösung relevanter
+ Praxisprobleme in den Mittelpunkt stellt \parencite[vgl.][S. 77]{hevner2004design}.
 
-Zunächst erfolgt eine systematische Analyse der Ausgangsdaten sowie der Anforderungen des zugrunde liegenden Datenbankschemas. Dabei werden die relevanten Datenfelder, deren Struktur sowie notwendige Transformationen identifiziert. Parallel dazu wird eine Literaturrecherche durchgeführt, um bestehende Ansätze zur Verarbeitung und Strukturierung unstrukturierter Daten sowie den Einsatz von LLMs in vergleichbaren Kontexten zu untersuchen.
+In der \textit{Konzeptionsphase} erfolgt zunächst eine systematische Anforderungsanalyse. Die Erhebung und Analyse der Aufgaben wird dabei agil über User Stories abgebildet, um 
+die funktionalen und nicht-funktionalen Anforderungen an die strukturierte Datenüberführung präzise zu spezifizieren \parencite[vgl.][S. 17ff.]{cohn2004user}. Parallel dazu wird 
+eine systematische Literaturrecherche nach etablierten methodischen Standards durchgeführt \parencite[vgl.][]{webster2002analyzing}, um bestehende Ansätze zur Verarbeitung 
+unstrukturierter Daten sowie den Einsatz von LLMs zu untersuchen. Aufbauend auf diesen Erkenntnissen wird die Softwarearchitektur für den LLM-basierten Ansatz entworfen. Hierbei 
+werden etablierte Prinzipien der Architekturentwicklung angewendet \parencite[vgl.][]{starke2014effektive}, um eine nahtlose Integration in bestehende Systeme zu gewährleisten.
 
-Aufbauend auf diesen Erkenntnissen wird ein LLM-basierter Ansatz zur Transformation unstrukturierter Produktdaten entwickelt. Dieser umfasst die Konzeption geeigneter Prompts, die Definition von Mapping-Strategien zwischen Eingabedaten und Zielschema sowie die Implementierung eines prototypischen Systems zur automatisierten Datenüberführung.
-
-Ergänzend wird ein regelbasierter Ansatz für ein ausgewähltes Referenzdatenfeld implementiert. Dieser dient als Baseline und ermöglicht einen direkten Vergleich zwischen klassischen deterministischen Verfahren und dem LLM-basierten Ansatz.
-
-Zur Bewertung der Ansätze wird ein geeigneter Datensatz definiert, der als Referenz (Ground Truth) für die Evaluation dient. Auf dieser Basis erfolgt eine quantitative Analyse anhand definierter Key Performance Indicators (KPIs). Dazu zählen insbesondere die Schema-Konformität der erzeugten Daten, die Vollständigkeit der Abbildung sowie die Genauigkeit der Extraktion für das Referenzdatenfeld. Ergänzend werden Effizienzaspekte wie Laufzeit und Verarbeitungskosten betrachtet.
-
-Die Evaluation erfolgt durch einen systematischen Vergleich der Ergebnisse beider Ansätze. Dabei werden sowohl die Qualität der erzeugten Daten als auch die Robustheit gegenüber variierenden Eingabeformaten analysiert. Abschließend werden die Ergebnisse interpretiert und hinsichtlich ihrer praktischen Einsetzbarkeit sowie ihrer Übertragbarkeit auf vergleichbare Anwendungsfälle bewertet.
+In der anschließenden \textit{Implementierungsphase} wird der konzipierte LLM-basierte Ansatz in Form eines Software-Prototyps umgesetzt. Dies umfasst das Prompt Engineering, die 
+Definition von Mapping-Strategien zwischen Eingabedaten und Zielschema sowie die technische Anbindung. Ergänzend wird ein regelbasierter Ansatz für ein ausgewähltes 
+Referenzdatenfeld implementiert. Dieser dient als Baseline und ermöglicht einen direkten Vergleich zwischen klassischen deterministischen Verfahren und dem LLM-basierten Ansatz.
