@@ -16,17 +16,20 @@ jedoch als äußerst fragil gegenüber variierenden Schreibweisen, uneinheitlich
 Insbesondere bei heterogenen Datenquellen stoßen sie an ihre Grenzen, da jede strukturelle Abweichung der Quelle eine manuelle Anpassung der Extraktionsregeln erfordert, 
 was in der Praxis zu einem kaum noch zu bewältigenden Wartungsaufwand führt \parencite[vgl.][S. 14]{ferrara2014web}.
 
-Gleichzeitig eröffnen LLMs (Large Language Models, dt. große Sprachmodelle) neue Möglichkeiten zur semantischen Interpretation und Strukturierung unstrukturierter Daten. Allerdings ist bislang unklar, 
-inwieweit solche Modelle zuverlässig und konsistent in der Lage sind, komplexe Datenstrukturen vollständig und korrekt abzubilden. Die Relevanz dieses Problems ergibt sich aus der 
-zentralen Rolle strukturierter Daten für nachgelagerte Prozesse wie Analyse, Suche oder Integration in bestehende Systeme. Eine fehlerhafte oder inkonsistente Datenüberführung 
-kann zu erheblichen Qualitätseinbußen und ineffizienten Prozessen führen. 
+Gleichzeitig eröffnen LLMs (Large Language Models, dt. große Sprachmodelle) neue Möglichkeiten zur semantischen Interpretation und Strukturierung unstrukturierter Daten 
+\parencite[vgl.][]{data_extraction_ai}. Allerdings ist bislang unklar, inwieweit solche Modelle zuverlässig und konsistent in der Lage sind, komplexe Datenstrukturen vollständig 
+und korrekt abzubilden \parencite[vgl.][S. 1283]{data_extraction_ai}. 
 
-Vor diesem Hintergrund stellt sich die Herausforderung, einen Ansatz zu entwickeln, der sowohl die 
-Flexibilität semantischer Modelle nutzt als auch die Anforderungen an Schema-Konformität und Datenqualität erfüllt. Zudem ist zu untersuchen, 
-wie sich ein solcher Ansatz im Vergleich zu klassischen regelbasierten Verfahren verhält und unter welchen Bedingungen ein praktischer Einsatz sinnvoll ist.
+Die Relevanz dieses Problems ergibt sich aus der zentralen Rolle strukturierter Daten für nachgelagerte Prozesse wie Analyse, Suche oder Integration in bestehende Systeme
+ \parencite[vgl.][S. 3]{doan2012principles}. Eine fehlerhafte oder inkonsistente Datenüberführung kann zu erheblichen Qualitätseinbußen und ineffizienten Prozessen führen 
+ \parencite[vgl.][S. 5--33]{wang1996beyond}. Vor diesem Hintergrund stellt sich die Herausforderung, einen Ansatz zu entwickeln, der sowohl die Flexibilität semantischer 
+ Modelle nutzt als auch die Anforderungen an
+ Schema-Konformität und Datenqualität erfüllt. Zudem ist zu untersuchen, wie sich ein solcher Ansatz im Vergleich zu klassischen regelbasierten Verfahren verhält und unter 
+ welchen Bedingungen ein praktischer Einsatz sinnvoll ist.
 
 Diese allgemeinen Herausforderungen zeigen sich unmittelbar in der operativen Praxis der snoopmedia GmbH, insbesondere bei der automatisierten Erfassung von 
 Lebensmittel"=Produktdaten. Durch bestehende Crawling-Pipelines werden bereits umfangreiche Rohdaten erhoben, die jedoch als hochgradig heterogene und unstrukturierte 
 Textbausteine, wie Bezeichnungen, komplexe Zutatenlisten oder Nährwertangaben, vorliegen. Die manuelle Überführung dieser Informationen in das streng definierte 
-Ziel-Datenbankschema des Unternehmens ist bei dem stetig wachsenden Datenvolumen ökonomisch nicht skalierbar. Da herkömmliche regelbasierte Verfahren aufgrund der variablen 
-Semantik und Formatierung der Quellseiten einen kaum zu bewältigenden Wartungsaufwand verursachen, besteht eine kritische Lücke in der automatisierten Datenverarbeitungskette.
+Ziel-Datenbankschema des Unternehmens ist bei dem stetig wachsenden Datenvolumen ökonomisch nicht skalierbar. Da herkömmliche regelbasierte Verfahren aufgrund der 
+variablen Semantik und Formatierung der Quellseiten einen kaum zu bewältigenden Wartungsaufwand verursachen, besteht eine kritische Lücke in der automatisierten 
+Datenverarbeitungskette.
