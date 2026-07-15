@@ -1,0 +1,144 @@
+\subsection{Technologische Grundlage und Projektstruktur}
+% Hier beschreibst du die verwendeten Technologien und die grobe Projektstruktur.
+
+% Inhalt:
+
+% Python als Implementierungssprache.
+% verwendete Bibliotheken.
+% lokale MongoDB.
+% Gemini API.
+% REST-/Datei-Input.
+% Ordnerstruktur des Projekts.
+% Trennung nach Adaptern, Ports, Services, Filtern, Modellen.
+
+\subsection{Implementierung der Eingabeschicht}
+% Hier kommt deine detaillierte InputPort-Modellierung hin. Das wäre in 3.2 zu kleinteilig, passt aber sehr gut in Kapitel 4.
+
+% Inhalt:
+
+% RestInputAdapter.
+% FileInputAdapter.
+% InboundPort.
+% InboundService.
+% DTOs:
+% TransformationInputDto
+% BatchDto
+% ggf. CreateBatchDto
+% Ablauf:
+% REST oder Datei liefert Eingabedaten.
+% Adapter erzeugt DTOs.
+% InboundService übergibt Daten an den TransformationService.
+% Rückgabe eines Batch-DTOs.
+% Unterschied zwischen externen DTOs und internen DB-Objekten.
+
+\subsection{Implementierung des TransformationService und der lokalen Persistenz}
+% Hier beschreibst du konkret, wie der TransformationService arbeitet.
+
+% Inhalt:
+
+% Initialisierung von BatchRequest.
+% Initialisierung von TransformationRequest.
+% Speicherung in MongoDB.
+% Statusaktualisierung.
+% Speicherung der Filterergebnisse.
+% Aktualisierung von BatchResultSummary.
+% Repository-Port bzw. Datenbankzugriff.
+% Methoden wie:
+% Batch erstellen.
+% Status aktualisieren.
+% Ergebnis eines Filters speichern.
+% Batchliste abrufen.
+
+\subsection{Implementierung der Tranformationspipeline}
+% Hier erklärst du, wie die Filter technisch verkettet werden.
+
+% Inhalt:
+
+% Pipeline-Start nach Initialisierung.
+% Übergabe des Arbeitsergebnisses von Filter zu Filter.
+% paralleler Bericht an den TransformationService.
+% Reihenfolge der Filter.
+% Behandlung des regelbasierten Vergleichszweigs.
+% ggf. PipelineRunner oder Steuerlogik.
+% Statusübergänge während der Verarbeitung.
+
+\subsection{Implementierung der LLM-basierten Extraktion}
+% Hier wird der LLM-Extraktor detailliert beschrieben.
+
+% Inhalt:
+
+% Aufbau des Prompts.
+% Übergabe des bereinigten Textes.
+% Nutzung der Gemini API.
+% JSON-Mode bzw. strukturierte Ausgabe.
+% Speicherung von:
+% Modellname
+% Prompt-Version
+% Schema-Version
+% Raw Output
+% Token-Anzahlen
+% Kosten
+% Fehler
+% Erzeugung von ProductExtraction.
+
+\subsection{Implementierung der Schema-Validierung und Normalisierung}
+% Ich würde Schema-Validierung und Normalisierung zusammenziehen, weil beide Schritte die LLM-Ausgabe technisch nachbearbeiten.
+
+% Inhalt:
+
+% JSON-Schema-Prüfung.
+% Erzeugung von SchemaValidationResult.
+% Speicherung von ValidationError.
+% Normalisierung von Mengenangaben.
+% Umrechnung in Gramm und Milliliter.
+% Behandlung von Einheiten über Unit.
+% Speicherung von NormalizationResult.
+% Erhaltung von Originalwerten.
+
+\subsection{Implementierung des regelbasierten Referenzansatzes}
+% Hier kommt der Baseline-Ansatz detailliert hin.
+
+% Inhalt:
+
+% Regex-/Heuristik-Ansatz.
+% Eingabe: bereinigter Text.
+% Ziel: Verpackungsgröße.
+% Ausgabe: RuleBasedExtractionResult.
+% Speicherung der Roh-Treffer.
+% Abgrenzung zur LLM-Extraktion.
+% Vorbereitung für Precision, Recall und F1.
+
+\subsection{Implementierung von Matching, Export und Bewertungsexport}
+% Diese drei Themen kannst du zusammenfassen, damit Kapitel 4 nicht zu kleinteilig wird.
+
+% Inhalt:
+
+% Produkt-Matching gegen lokale Produkte.
+% Kriterien:
+% EAN
+% Titel
+% Marke
+% Hersteller
+% Speicherung von MatchingResult.
+% Erzeugung des Ziel-JSON.
+% Übergabe an Ziel-API.
+% Speicherung von ExportResult.
+% Bewertungsexport als CSV/JSON.
+% Export der Batch- und Evaluationsergebnisse.
+
+\subsection{Qualitätssicherung und Fehlerbehandlung}
+% Dieser Abschnitt bleibt als Abschluss von Kapitel 4 erhalten und passt zu deinem ursprünglichen Gliederungsentwurf.
+
+% Inhalt:
+
+% technische Fehlerbehandlung.
+% Retry und Backoff.
+% Umgang mit 429-Fehlern.
+% ungültige LLM-Ausgaben.
+% Schemafehler.
+% fehlerhafte oder unvollständige Eingabedaten.
+% Logging.
+% Tests einzelner Filter.
+% Tests der Normalisierung.
+% Tests des regelbasierten Ansatzes.
+% Validierung der Ziel-JSON-Erzeugung.

@@ -1,0 +1,476 @@
+{
+  "@id": "123456",
+  "productId": "http://ai4bd.com/resource/data/product/a9ac634a-9905-40eb-b5ad-5c182b42c6ab",
+  "images": {
+    "https://img.rewe-static.de/someimage.png": "data:image/png;base64,jklijioj=="
+  },
+  "main_image": "https://img.rewe-static.de/someimage.png",
+  "combinedProductIds": [
+    "http://ai4bd.com/resource/data/product/a9ac634a-9905-40eb-b5ad-5c182b42c6ab",
+    "http://ai4bd.com/resource/data/product/a9ac634a-9905-40eb-b5ad-5c182b42c6ed"
+  ],
+  "extracted": {
+    "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+    "@id": "http://ai4bd.com/resource/data/product/a9ac634a-9905-40eb-b5ad-5c182b42c6bc",
+    "@type": "ddm-repro:ProductCrawl",
+    "edm:dateCreated": "2021-06-12 15:30:25",
+    "edm:pageUrl": "https://www.shop.rewe.de/product/324643",
+    "edm:externalId": 12345,
+    "ddm-repro:sourceName": "Rewe",
+    "ddm-repro:hasProductHeaderData": {
+      "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+      "@id": "http://ai4bd.com/resource/data/product/a9ac634a-9905-40eb-b5ad-5c182b42c6cd",
+      "@type": "ddm-repro:ProductHeaderData",
+      "ddm-repro:ingredientText": "Zucker, Kakaobutter, Rosinen 14 %, VOLLMILCHPULVER 13 %",
+      "edm:priceOrCost": 10.95,
+      "ddm-repro:hasChildOptics": true,
+      "ddm-repro:isLactoseFree": false,
+      "ddm-repro:isBioProduct": false,
+      "ddm-repro:freeSugar": true,
+      "ddm-repro:hasStevia": false,
+      "ddm-repro:hasSugarAlcohols": false,
+      "ddm-repro:hasSweetener": false,
+      "ddm-repro:isJuicy": false,
+      "ddm-repro:isValid": true,
+      "ddm-repro:isProduct": true,
+      "ddm-repro:noAdditions": false,
+      "ddm-repro:taste": "Vanille",
+      "ddm-repro:groupFat": "fettarm",
+      "ddm-repro:productType": "Milchmischgetraenke",
+      "ddm-repro:groupSugar": "zuckerfrei",
+      "edm:productOrServiceTitle": "Vanillejoghurt",
+      "edm:brandName": "Allgaeuer Hof-Milch",
+      "edm:organizationName": "Allgaeuer Hof-Milch GmbH",
+      "ddm-repro:nutriScore": "A",
+      "ddm-repro:packagingSize": "250",
+      "edm:ean": 123456,
+      "qudt:unitPackagingSize": {
+        "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+        "@id": "http://qudt.org/2.1/vocab/unit/GM/699566ae-bbbd-479b-a7f3-fa95fa8ec8a5",
+        "@type": "unit:GM"
+      },
+      "ddm-repro:referenceValue": 100,
+      "qudt:unitReferenceValue": {
+        "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+        "@id": "http://qudt.org/2.1/vocab/unit/GM/699566ae-bbbd-479b-a7f3-fa95fa8ec8a5",
+        "@type": "unit:GM"
+      }
+    },
+    "ddm-repro:hasIngredient": {
+      "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+      "@id": "http://ai4bd.com/resource/data/collection/e1281249-65e8-4695-af9c-04bf334ea411",
+      "@type": "Collection",
+      "edm.itemType": {
+        "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+        "@id": "http://ai4bd.com/resource/data/ddm/repro/Ingredient/764827a9-c9e1-4662-8b01-5148a2c7e186",
+        "@type": "ddm-repro:Ingredient"
+      },
+      "gdm:contains": [
+        {
+          "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+          "@id": "http://ai4bd.com/resource/data/ddm/repro/Ingredient/44203d5b-e2d9-468f-811e-ab09b884fc53",
+          "@type": "ddm-repro:Ingredient",
+          "gdm:contains": [
+            {
+              "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+              "@id": "http://ai4bd.com/resource/data/gdm/resource-attribute/6ab63884-9aa4-45f1-914b-66a76b43af3f",
+              "@type": "gdm:ResourceAttribute",
+              "edm:title": "Zucker"
+            },
+            {
+              "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+              "@id": "http://ai4bd.com/resource/data/gdm/resource-attribute/0cc3e45b-be08-4636-92a8-1efaade5e7bb",
+              "@type": "gdm:ResourceAttribute",
+              "edm:sequenceNumber": 0
+            }
+          ]
+        },
+        {
+          "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+          "@id": "http://ai4bd.com/resource/data/ddm/repro/Ingredient/cfc97af4-1359-45ca-9fd1-f5b80a2886c8",
+          "@type": "ddm-repro:Ingredient",
+          "gdm:contains": [
+            {
+              "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+              "@id": "http://ai4bd.com/resource/data/gdm/resource-attribute/15e6567d-7bae-4322-98ee-51fbdb157059",
+              "@type": "gdm:ResourceAttribute",
+              "edm:title": "Kakaobutter"
+            },
+            {
+              "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+              "@id": "http://ai4bd.com/resource/data/gdm/resource-attribute/edc2295a-43a1-47d2-9dab-2cd1c955278a",
+              "@type": "gdm:ResourceAttribute",
+              "edm:sequenceNumber": 1
+            }
+          ]
+        },
+        {
+          "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+          "@id": "http://ai4bd.com/resource/data/ddm/repro/Ingredient/9f0180ab-0f35-432b-9477-12357cf381ca",
+          "@type": "ddm-repro:Ingredient",
+          "gdm:contains": [
+            {
+              "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+              "@id": "http://ai4bd.com/resource/data/gdm/resource-attribute/f06be855-9363-4731-a178-2e9597ca3a50",
+              "@type": "gdm:ResourceAttribute",
+              "edm:title": "Rosinen"
+            },
+            {
+              "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+              "@id": "http://ai4bd.com/resource/data/gdm/resource-attribute/ed5f351a-3d68-4226-ada7-b179394564af",
+              "@type": "gdm:ResourceAttribute",
+              "edm:sequenceNumber": 2
+            },
+            {
+              "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+              "@id": "http://ai4bd.com/resource/data/gdm/resource-attribute/6e5efb1e-5e0f-4772-9189-b51cac472f70",
+              "@type": "gdm:ResourceAttribute",
+              "edm:ratio": 14.0,
+              "qudt:unit": {
+                "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+                "@id": "http://qudt.org/2.1/vocab/unit/PERCENT/dc364e64-ad41-421c-8e51-6540e441298e",
+                "@type": "unit:PERCENT"
+              }
+            }
+          ]
+        },
+        {
+          "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+          "@id": "http://ai4bd.com/resource/data/ddm/repro/Ingredient/239b5eef-2fb0-4e93-82ee-4d3965e6c6d1",
+          "@type": "ddm-repro:Ingredient",
+          "gdm:contains": [
+            {
+              "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+              "@id": "http://ai4bd.com/resource/data/gdm/resource-attribute/8e6c2368-fb48-441b-82ee-fcc745be2738",
+              "@type": "gdm:ResourceAttribute",
+              "edm:title": "VOLLMILCHPULVER"
+            },
+            {
+              "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+              "@id": "http://ai4bd.com/resource/data/gdm/resource-attribute/c206b4a5-39ac-4309-929f-6e3011b64289",
+              "@type": "gdm:ResourceAttribute",
+              "edm:sequenceNumber": 3
+            },
+            {
+              "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+              "@id": "http://ai4bd.com/resource/data/gdm/resource-attribute/debf76a8-e0cc-4a9f-b4fb-58e80781f6bc",
+              "@type": "gdm:ResourceAttribute",
+              "edm:ratio": 13.0,
+              "qudt:unit": {
+                "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+                "@id": "http://qudt.org/2.1/vocab/unit/PERCENT/5bc8a9ea-4751-4f2b-b5a1-35f4917be03f",
+                "@type": "unit:PERCENT"
+              }
+            }
+          ]
+        },
+        {
+          "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+          "@id": "http://ai4bd.com/resource/data/ddm/repro/Ingredient/1bb11b06-35c2-4349-ac22-5450143879b8",
+          "@type": "ddm-repro:Ingredient",
+          "gdm:contains": [
+            {
+              "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+              "@id": "http://ai4bd.com/resource/data/gdm/resource-attribute/b414816b-b39a-4376-83ad-7e4404369985",
+              "@type": "gdm:ResourceAttribute",
+              "edm:title": "MOLKENPULVER"
+            },
+            {
+              "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+              "@id": "http://ai4bd.com/resource/data/gdm/resource-attribute/dad99d03-6575-4dae-be13-23e90ea87eb5",
+              "@type": "gdm:ResourceAttribute",
+              "edm:sequenceNumber": 4
+            }
+          ]
+        },
+        {
+          "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+          "@id": "http://ai4bd.com/resource/data/ddm/repro/Ingredient/3eae3678-d60f-45fd-920a-2186cd1a21f4",
+          "@type": "ddm-repro:Ingredient",
+          "gdm:contains": [
+            {
+              "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+              "@id": "http://ai4bd.com/resource/data/gdm/resource-attribute/4ecd3dba-f486-46ef-9b62-e2a61da953ab",
+              "@type": "gdm:ResourceAttribute",
+              "edm:title": "Kakaomasse"
+            },
+            {
+              "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+              "@id": "http://ai4bd.com/resource/data/gdm/resource-attribute/61c79f98-8f07-4724-88b6-f1b1d23ca143",
+              "@type": "gdm:ResourceAttribute",
+              "edm:sequenceNumber": 5
+            }
+          ]
+        },
+        {
+          "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+          "@id": "http://ai4bd.com/resource/data/ddm/repro/Ingredient/a6730ccd-4a01-417b-b439-1fa42c21b174",
+          "@type": "ddm-repro:Ingredient",
+          "gdm:contains": [
+            {
+              "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+              "@id": "http://ai4bd.com/resource/data/gdm/resource-attribute/ca7ee406-4041-4e36-97e1-60a6b297ace4",
+              "@type": "gdm:ResourceAttribute",
+              "edm:title": "geroestete gehackte HASELNUESSE"
+            },
+            {
+              "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+              "@id": "http://ai4bd.com/resource/data/gdm/resource-attribute/2c59bc51-c2f8-4dd3-ae79-e24c1eaa33d9",
+              "@type": "gdm:ResourceAttribute",
+              "edm:sequenceNumber": 6
+            },
+            {
+              "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+              "@id": "http://ai4bd.com/resource/data/gdm/resource-attribute/9918473f-7174-46fe-a612-f7bb44f41b65",
+              "@type": "gdm:ResourceAttribute",
+              "edm:ratio": 5.5,
+              "qudt:unit": {
+                "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+                "@id": "http://qudt.org/2.1/vocab/unit/PERCENT/ab7868bf-8dd5-404f-85ff-da26fcb164c2",
+                "@type": "unit:PERCENT"
+              }
+            }
+          ]
+        },
+        {
+          "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+          "@id": "http://ai4bd.com/resource/data/ddm/repro/Ingredient/fa4e12be-bb67-4b70-aefa-f0bc108cf8e1",
+          "@type": "ddm-repro:Ingredient",
+          "gdm:contains": [
+            {
+              "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+              "@id": "http://ai4bd.com/resource/data/gdm/resource-attribute/ed659929-3c04-4472-85e8-b0c21fbe0cbd",
+              "@type": "gdm:ResourceAttribute",
+              "edm:title": "BUTTERREINFETT"
+            },
+            {
+              "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+              "@id": "http://ai4bd.com/resource/data/gdm/resource-attribute/e280868b-7df9-4ea0-8150-aa910eaf78b0",
+              "@type": "gdm:ResourceAttribute",
+              "edm:sequenceNumber": 7
+            }
+          ]
+        },
+        {
+          "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+          "@id": "http://ai4bd.com/resource/data/ddm/repro/Ingredient/d42648b3-01f0-46aa-bc9b-597526c239d7",
+          "@type": "ddm-repro:Ingredient",
+          "gdm:contains": [
+            {
+              "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+              "@id": "http://ai4bd.com/resource/data/gdm/resource-attribute/1da4e646-029f-479a-a18d-5faf51106ea7",
+              "@type": "gdm:ResourceAttribute",
+              "edm:title": "Emulgator (Lecithine (SOJA))"
+            },
+            {
+              "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+              "@id": "http://ai4bd.com/resource/data/gdm/resource-attribute/f499a096-93fb-49d7-8900-d9c2ecbb3ef3",
+              "@type": "gdm:ResourceAttribute",
+              "edm:sequenceNumber": 8
+            }
+          ]
+        },
+        {
+          "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+          "@id": "http://ai4bd.com/resource/data/ddm/repro/Ingredient/67b33fd8-d668-4819-9ad5-444c00a04672",
+          "@type": "ddm-repro:Ingredient",
+          "gdm:contains": [
+            {
+              "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+              "@id": "http://ai4bd.com/resource/data/gdm/resource-attribute/83db6e03-0fe9-4422-be29-0c4d1d3cb2f0",
+              "@type": "gdm:ResourceAttribute",
+              "edm:title": "Bourbon-Vanilleextrakt"
+            },
+            {
+              "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+              "@id": "http://ai4bd.com/resource/data/gdm/resource-attribute/b84ca4c4-4430-47f1-a698-e4651682f069",
+              "@type": "gdm:ResourceAttribute",
+              "edm:sequenceNumber": 9
+            }
+          ]
+        }
+      ]
+    },
+    "ddm-repro:hasNutritionalValue": {
+      "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+      "@id": "http://ai4bd.com/resource/data/ddm/repro/nutritional-value/302a5d5d-3e66-4153-89d3-0ded40a37408",
+      "@type": "ddm-repro:NutritionalValue",
+      "gdm:contains": [
+        {
+          "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+          "@id": "http://ai4bd.com/resource/data/gdm/resource-attribute/00054bfb-7100-445b-82b6-74390ce16246",
+          "@type": "gdm:ResourceAttribute",
+          "ddm-repro:packagingSize": "100",
+          "qudt:unit": {
+            "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+            "@id": "http://qudt.org/2.1/vocab/unit/GM/699566ae-bbbd-479b-a7f3-fa95fa8ec8a5",
+            "@type": "unit:GM"
+          }
+        },
+        {
+          "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+          "@id": "http://ai4bd.com/resource/data/gdm/resource-attribute/4cee5164-d47e-41f2-8a03-8d3ce59e2b38",
+          "@type": "gdm:ResourceAttribute",
+          "ddm-repro:referenceValue": "100",
+          "qudt:unit": {
+            "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+            "@id": "http://qudt.org/2.1/vocab/unit/GM/15b7239d-ad8d-45f1-b5ef-3c63627cca0b",
+            "@type": "unit:GM"
+          }
+        },
+        {
+          "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+          "@id": "http://ai4bd.com/resource/data/gdm/resource-attribute/b27c5682-f72b-4ff5-8563-0be42d4b7357",
+          "@type": "gdm:ResourceAttribute",
+          "ddm-repro:calories": "512",
+          "qudt:unit": {
+            "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+            "@id": "http://qudt.org/2.1/vocab/unit/KiloCAL/b8b7c892-e915-4058-bc54-0b7c9fb815ba",
+            "@type": "unit:KiloCAL"
+          }
+        },
+        {
+          "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+          "@id": "http://ai4bd.com/resource/data/gdm/resource-attribute/ea1a0379-dd0d-49ad-be2b-e32bd1bb444b",
+          "@type": "gdm:ResourceAttribute",
+          "ddm-repro:joule": "2.139",
+          "qudt:unit": {
+            "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+            "@id": "http://qudt.org/2.1/vocab/unit/KiloJ/93abd673-48b4-42ce-aa8b-0a733229f5af",
+            "@type": "unit:KiloJ"
+          }
+        },
+        {
+          "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+          "@id": "http://ai4bd.com/resource/data/gdm/resource-attribute/d556c5e4-5a5c-4fc9-bea6-d10517aa98b5",
+          "@type": "gdm:ResourceAttribute",
+          "ddm-repro:energyRemark": ""
+        },
+        {
+          "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+          "@id": "http://ai4bd.com/resource/data/gdm/resource-attribute/8e882458-e9dd-4e05-965d-e11142f30f5c",
+          "@type": "gdm:ResourceAttribute",
+          "ddm-repro:fat": "28.6",
+          "qudt:unit": {
+            "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+            "@id": "http://qudt.org/2.1/vocab/unit/GM/1b662a67-868f-4a42-80c1-d65522884d4a",
+            "@type": "unit:GM"
+          }
+        },
+        {
+          "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+          "@id": "http://ai4bd.com/resource/data/gdm/resource-attribute/a77a92f3-b4cc-4baf-a023-ce2434a48997",
+          "@type": "gdm:ResourceAttribute",
+          "ddm-repro:saturatedFat": "15.8",
+          "qudt:unit": {
+            "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+            "@id": "http://qudt.org/2.1/vocab/unit/GM/f7cde71c-176e-425e-b2c0-c7b2c7386c21",
+            "@type": "unit:GM"
+          }
+        },
+        {
+          "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+          "@id": "http://ai4bd.com/resource/data/gdm/resource-attribute/712f557e-c7e9-48a0-8342-fe7dc008fb22",
+          "@type": "gdm:ResourceAttribute",
+          "ddm-repro:carbohydrates": "56.4",
+          "qudt:unit": {
+            "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+            "@id": "http://qudt.org/2.1/vocab/unit/GM/fe2c2d60-a711-47ba-8529-ae201713d3f7",
+            "@type": "unit:GM"
+          }
+        },
+        {
+          "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+          "@id": "http://ai4bd.com/resource/data/gdm/resource-attribute/193873bc-fa63-4f50-9ed6-7e33fe9991ac",
+          "@type": "gdm:ResourceAttribute",
+          "ddm-repro:sugar": "55.6",
+          "qudt:unit": {
+            "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+            "@id": "http://qudt.org/2.1/vocab/unit/GM/a76f358b-ef27-413d-9777-717b8064be37",
+            "@type": "unit:GM"
+          }
+        },
+        {
+          "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+          "@id": "http://ai4bd.com/resource/data/gdm/resource-attribute/128f5944-91a4-4819-82e4-0eec48f8a2d8",
+          "@type": "gdm:ResourceAttribute",
+          "ddm-repro:protein": "6.1",
+          "qudt:unit": {
+            "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+            "@id": "http://qudt.org/2.1/vocab/unit/GM/8fce4aab-e628-4d97-b23e-2cc0eabdaa8c",
+            "@type": "unit:GM"
+          }
+        },
+        {
+          "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+          "@id": "http://ai4bd.com/resource/data/gdm/resource-attribute/685f54dd-83d5-4100-a01e-cb94ea9a25e1",
+          "@type": "gdm:ResourceAttribute",
+          "ddm-repro:salt": "0.25",
+          "qudt:unit": {
+            "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+            "@id": "http://qudt.org/2.1/vocab/unit/GM/0b76768d-72b3-4dee-9d2c-ae0730afd566",
+            "@type": "unit:GM"
+          }
+        }
+      ]
+    },
+    "ddm-repro:productGroup": [
+      {
+        "@id": "http://ai4bd.com/resource/data/87c647f9-4358-4085-8b1e-5554ddf3e5ca",
+        "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+        "@type": "edm:ProductGroup",
+        "edm:title": "Joghurt",
+        "gdm:contains": [
+          "http://ai4bd.com/resource/data/baffa9a2-a368-4085-a054-939cc9788e10"
+        ]
+      },
+      {
+        "@id": "http://ai4bd.com/resource/data/baffa9a2-a368-4085-a054-939cc9788e10",
+        "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+        "@type": "edm:ProductGroup",
+        "edm:title": "Joghurt Kinderoptik"
+      }
+    ],
+    "gdm:uses": {
+      "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+      "@id": "http://ai4bd.com/resource/data/product/a9ac634a-9905-40eb-b5ad-5c182b42c6bc",
+      "@type": "edm:Product",
+      "gdm:contains": [
+        {
+          "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+          "@id": "http://ai4bd.com/resource/data/product/a9ac634a-9905-40eb-b5ad-5c182b42c6bc",
+          "@type": "ddm-repro:ProductSizing",
+          "qudt:unit": {
+            "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+            "@id": "http://qudt.org/2.1/vocab/unit/GM/699566ae-bbbd-479b-a7f3-fa95fa8ec8a5",
+            "@type": "unit:GM"
+          },
+          "ddm-repro:packagingSize": 250,
+          "edm:ean": 123456
+        }
+      ],
+      "edm:productOrServiceTitle": "Vanillejogurt",
+      "ddm-repro:brandName": "Allgaeuer Hof-Milch",
+      "edm:organizationName": "Allgaeuer Hof-Milch GmbH",
+      "edm:dateCreated": "2021-06-12 15:30:25",
+      "ddm-repro:technicalName": "Fettarmer Joghurt mit Vanillegeschmack",
+      "edm:memberOf": [
+        {
+          "@id": "http://ai4bd.com/resource/data/87c647f9-4358-4085-8b1e-5554ddf3e5ca",
+          "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+          "@type": "edm:ProductGroup",
+          "edm:title": "Joghurt",
+          "gdm:contains": [
+            "http://ai4bd.com/resource/data/baffa9a2-a368-4085-a054-939cc9788e10"
+          ]
+        },
+        {
+          "@id": "http://ai4bd.com/resource/data/baffa9a2-a368-4085-a054-939cc9788e10",
+          "@context": "http://models.ai4bd.org/jsonld/edm-context.jsonld",
+          "@type": "edm:ProductGroup",
+          "edm:title": "Joghurt Kinderoptik"
+        }
+      ]
+    }
+  }
+}

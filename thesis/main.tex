@@ -1,0 +1,108 @@
+\documentclass[
+  11pt,
+  a4paper,
+  oneside,
+  titlepage,
+  numbers=noenddot
+]{scrartcl}
+
+\input{preamble}
+
+\begin{document}
+
+% --- Frontmatter (Römische Nummerierung) ---
+\pagenumbering{roman} 
+\pagestyle{plain}
+
+\begin{titlepage}
+    % Erzwingt für diese Seite absolut gleiche Ränder (Zentrierung auf dem Papier)
+    \newgeometry{left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm} 
+    \centering
+
+    % Logo oben
+    \includegraphics[width=0.4\textwidth]{figures/uni_logo.png}\par
+    \vspace{1.5cm}
+
+    {\scshape\LARGE Hochschule Bonn-Rhein-Sieg \par}
+    \vspace{0.5cm}
+    {\scshape\Large Fachbereich Informatik \par}
+    \vspace{2cm}
+
+    {\huge\bfseries Bachelorarbeit in BWI \par}
+    \vspace{1.5cm}
+
+    {\LARGE\bfseries Entwicklung \& Evaluation eines Konzepts zur automatisierten Transformation unstrukturierter Produktdaten mittels großer Sprachmodelle \par}
+    \vspace{0.5cm}
+
+    \vfill
+
+    \begin{flushleft}
+    \large
+    \textbf{\today} \\
+    \textbf{Autor:} Fabian Lohoff \\
+    \textbf{Matrikelnummer:} 9051803 \\
+    \textbf{Unternehmen:} snoopmedia GmbH \\
+    \textbf{Bearbeitungszeitraum:} Mai 2026 -- August 2026 \\
+    \textbf{Erstprüfer:} Prof. Dr. Sascha Alda \\
+    \textbf{Zweitprüfer:} Prof. Dr. Raoul Könsgen \\
+    \textbf{Fachlicher Betreuer:} Ronald Brenner
+    \end{flushleft}
+
+    \vfill
+
+\end{titlepage}
+
+\section{Eidesstattliche Erklärung}
+\input{chapters/00_eidesstatt/main.tex}
+\clearpage
+
+% Das Inhaltsverzeichnis folgt auf das Titelblatt (Seite ii)
+\tableofcontents
+\clearpage
+
+% --- Mainmatter (Arabische Nummerierung) ---
+\pagenumbering{arabic} % Startet die Zählung bei 1
+\setcounter{page}{1}   % Stellt sicher, dass die Problemstellung Seite 1 ist
+
+% Länge insgesamt Richtwert: 50-60 Seiten
+
+% Länge Richtwert: 2-3 Seiten
+\section{Einleitung}
+\input{chapters/01_einleitung/main.tex}
+
+% Länge Richtwert: 1/3 von Kap. 3+4+5
+% Länge Richtwert: 11-14 Seiten
+\clearpage
+\section{Grundlagen und Stand der Forschung}
+\input{chapters/02_grundlagen/main.tex}
+
+% Länge Richtwert Kap. 3+4+5: 3 * Länge Kap. 2
+% Länge Richtwert: 34-42 Seiten
+\clearpage
+\input{chapters/03_konzeption/main.tex}
+
+\clearpage
+\section{Implementierung}
+\label{sec:implementierung}
+\input{chapters/04_implementierung/main.tex}
+
+\clearpage
+\section{Evaluierung der Ergebnisse}
+\input{chapters/05_evaluierung/main.tex}
+
+% Länge Richtwert 1-2 Seiten
+\clearpage
+\section{Zusammenfassung und Ausblick}
+\input{chapters/06_zusammenfassung/main.tex}
+
+% --- Appendix ---
+% Hinweis: Laut Richtlinie 3.2 laufen arabische Ziffern im Anhang meist weiter.
+\clearpage
+\appendix
+\input{chapters/appendix.tex}
+
+\section{Vorläufiges Literaturverzeichnis}
+% Literaturverzeichnis wird nach Richtlinie 3.2 ebenfalls arabisch weitergezählt
+\printbibliography
+
+\end{document}

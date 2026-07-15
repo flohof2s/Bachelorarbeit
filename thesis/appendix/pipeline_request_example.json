@@ -1,0 +1,10 @@
+{
+  "id": 123456,
+  "url": "https://shop.rewe.de/p/harry-das-volle-korn-korn-an-korn-500g/4922298?source=mc",
+  "time": 12345678.123,
+  "shop": "rewe",
+  "images": {
+    "https://img.rewe-static.de/7938726/32493712_digital-image.png": "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDB..."
+  },
+  "html": "<html></html>"
+}
