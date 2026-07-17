@@ -1,31 +1,26 @@
-Das vorangegangene Kapitel hat die fachlichen und technischen Anforderungen an den CrawlDataTransformer hergeleitet und in einen Architekturentwurf überführt. Aufbauend darauf 
-beschreibt dieses Kapitel die prototypische Umsetzung der zentralen Entwurfsentscheidungen. Im Mittelpunkt stehen dabei die konkreten Mechanismen, durch die unstrukturierte 
-Produktdaten vorverarbeitet, extrahiert, geprüft, normalisiert und für die weitere Verarbeitung bereitgestellt werden.
+Das vorangegangene Kapitel hat die fachlichen und technischen Anforderungen an den CrawlDataTransformer in einen Architekturentwurf überführt. Dieses Kapitel beschreibt 
+die prototypische Umsetzung der für die Forschungsfragen maßgeblichen Mechanismen. Im Mittelpunkt stehen die gemeinsame Vorverarbeitung, die LLM-basierte Extraktion mit 
+ihrer Promptstrategie, der regelbasierte Referenzansatz für \textit{ProductSizing} sowie die technische Vorbereitung der nachfolgenden Evaluation.
 
-Eine vollständige Beschreibung sämtlicher Klassen, Adapter und Persistenzkomponenten ist für die Zielsetzung der Arbeit nicht erforderlich. Die Darstellung konzentriert sich daher 
-auf diejenigen Implementierungsaspekte, die für die Untersuchung der Extraktionsansätze, ihre Vergleichbarkeit und die anschließende Evaluation maßgeblich sind. Hierzu zählen 
-insbesondere die gemeinsame HTML-Vorverarbeitung, die mehrphasige Transformationsverarbeitung, die LLM-basierte Extraktion einschließlich der Promptstrategie, der regelbasierte 
-Referenzansatz für das Datenfeld \textit{ProductSizing} sowie die Schema-Validierung, Normalisierung und Erfassung der Evaluationsdaten.
-
-Abschnitt 5.1 beschreibt zunächst den technologischen Implementierungsrahmen. Abschnitt 5.2 erläutert die technische Umsetzung der Transformationsverarbeitung und der gemeinsamen 
-Vorverarbeitung. Die LLM-basierte Extraktion und ihre Promptstrategie werden in Abschnitt 5.3 dargestellt. Abschnitt 5.4 behandelt die Umsetzung des kaskadierten regelbasierten 
-Referenzansatzes. Abschließend fasst Abschnitt 5.5 die nachgelagerte Validierung, die technische Unterstützung der Evaluation und die Anbindung an das Zielsystem zusammen.
+Auf eine vollständige Beschreibung sämtlicher Klassen, Adapter und Persistenzkomponenten wird verzichtet. Abschnitt 5.1 ordnet zunächst die verwendeten Technologien ein. 
+Abschnitt 5.2 beschreibt die mehrphasige Transformationsverarbeitung und die gemeinsame Eingabebasis der Extraktionszweige. Die Umsetzung der LLM-basierten und der 
+regelbasierten Extraktion folgt in den Abschnitten 5.3 und 5.4. Abschnitt 5.5 behandelt abschließend Schema-Validierung, Normalisierung, Evaluationsunterstützung und 
+Systemintegration.
 
 \subsection{Technologischer Implementierungsrahmen}
 
-Der technologische Implementierungsrahmen ergibt sich aus den in Kapitel 4 beschriebenen Anforderungen und den bestehenden Randbedingungen des Projektkontexts. Python, die Gemini API 
-und MongoDB waren als grundlegende Technologien vorgegeben. Die ergänzend eingesetzten Frameworks und Bibliotheken wurden so gewählt, dass sie die typisierte Verarbeitung 
-verschachtelter Produktdaten, die zeitlich getrennte Kommunikation mit externen Diensten, die schrittweise Persistierung von Zwischenständen sowie unterschiedliche Eingabe- und 
-Ausgabewege unterstützen. Der Prototyp verwendet Python 3.12 als einheitliche Laufzeitbasis.
+Python, die Gemini API und MongoDB waren als grundlegende Technologien durch den Projektkontext vorgegeben. Die ergänzenden Frameworks und Bibliotheken wurden hinsichtlich 
+der typisierten Verarbeitung verschachtelter Produktdaten, asynchroner Ein- und Ausgabeoperationen, schrittweiser Persistierung sowie der Anbindung unterschiedlicher 
+Schnittstellen ausgewählt. Als einheitliche Laufzeitbasis verwendet der Prototyp Python 3.12.
 
-Die zentralen Technologien und ihre jeweilige Funktion innerhalb des CrawlDataTransformer sind in Tabelle~\ref{tab:technologien-implementierung} zusammengefasst.
+Die zentralen Technologien und ihre Funktion innerhalb des CrawlDataTransformer sind in Tabelle~\ref{tab:technologien-implementierung} zusammengefasst.
 
 \begin{table}[H]
     \centering
     \begingroup
     \small
     \setlength{\tabcolsep}{5pt}
-    \renewcommand{\arraystretch}{1.18}
+    \renewcommand{\arraystretch}{1.16}
     \begin{tabularx}{\textwidth}{
         @{}
         >{\raggedright\arraybackslash}p{0.18\textwidth}
@@ -46,27 +41,27 @@ Die zentralen Technologien und ihre jeweilige Funktion innerhalb des CrawlDataTr
 
         Nebenläufigkeit
         & \texttt{asyncio}
-        & Asynchrone Bearbeitung von Ein- und Ausgaben, Begrenzung gleichzeitig verarbeiteter Anfragen und Koordination der beiden Extraktionszweige. \\
+        & Asynchrone Bearbeitung von Ein- und Ausgaben, Worker-Steuerung und Koordination der Extraktionszweige. \\
         \addlinespace[2pt]
 
         Persistenz
         & MongoDB, Beanie, Motor
-        & Dokumentorientierte Speicherung verschachtelter und während der Verarbeitung schrittweise ergänzter Arbeits-, Zustands- und Evaluationsdaten. \\
+        & Dokumentorientierte Speicherung verschachtelter Arbeits-, Zustands- und Evaluationsdaten. \\
         \addlinespace[2pt]
 
         Ein- und Ausgabe
         & FastAPI, Uvicorn, Click, HTTPX
-        & Bereitstellung der REST- und Kommandozeilenschnittstelle sowie HTTP-basierte Kommunikation mit der Ziel-API. \\
+        & Bereitstellung der REST- und Kommandozeilenschnittstelle sowie Kommunikation mit der Ziel-API. \\
         \addlinespace[2pt]
 
         HTML und LLM
         & Beautiful Soup, Google Gen AI SDK
-        & Strukturorientierte Verarbeitung der HTML-Dokumente und technische Anbindung der Gemini API. \\
+        & Verarbeitung der HTML-Dokumente und technische Anbindung der Gemini API. \\
         \addlinespace[2pt]
 
         Ausführung
         & Docker Compose, PDM
-        & Bereitstellung einer einheitlichen lokalen Laufzeitumgebung sowie Verwaltung und Festschreibung der Python-Abhängigkeiten. \\
+        & Bereitstellung der lokalen Laufzeitumgebung sowie Verwaltung und Festschreibung der Abhängigkeiten. \\
 
         \bottomrule
     \end{tabularx}
@@ -75,124 +70,266 @@ Die zentralen Technologien und ihre jeweilige Funktion innerhalb des CrawlDataTr
     \endgroup
 \end{table}
 
-Python bildet die gemeinsame Grundlage für den Anwendungskern, die fachlichen Filter und die technischen Adapter. Die internen Datenstrukturen werden überwiegend als Pydantic-Modelle 
-umgesetzt. Dadurch können Eingaben, Batchkonfigurationen, Verarbeitungsergebnisse und verschachtelte Produktobjekte typisiert abgebildet und an den Grenzen einzelner 
-Verarbeitungsschritte geprüft werden. Die Modelle dienen zugleich als gemeinsame Repräsentation zwischen dem Anwendungskern und den technischen Adaptern. Datenbankspezifische 
-Dokumentmodelle bleiben davon getrennt und werden über Mapper in die Domänenmodelle beziehungsweise aus diesen überführt.
+Pydantic bildet die gemeinsamen internen Datenmodelle und prüft Eingaben sowie Verarbeitungsergebnisse an den Grenzen einzelner Schritte. Datenbankspezifische 
+Dokumentmodelle bleiben hiervon getrennt und werden über Mapper in Domänenmodelle beziehungsweise aus diesen überführt. Für I/O-intensive Datenbank- und API-Zugriffe 
+verwendet der Prototyp \texttt{asyncio}. Dies ermöglicht die nebenläufige Bearbeitung mehrerer Transformationsanfragen, stellt jedoch keine parallele CPU-Verarbeitung 
+über mehrere Prozessorkerne dar. Die Anzahl der Worker in den requestbezogenen Vorbereitungs- und Nachverarbeitungspipelines wird über die Batchkonfiguration begrenzt.
 
-Die Verarbeitung enthält mehrere I/O-intensive Operationen, insbesondere Zugriffe auf MongoDB sowie die Kommunikation mit der Gemini API und der Ziel-API. Hierfür verwendet der 
-Prototyp die asynchrone Laufzeitunterstützung von \texttt{asyncio}. Diese ermöglicht die nebenläufige Bearbeitung mehrerer Transformationsanfragen und die Koordination des 
-LLM-basierten und des regelbasierten Extraktionszweigs, ohne die Verarbeitung als parallele Berechnung über mehrere Prozessorkerne auszulegen. Die Anzahl gleichzeitig 
-bearbeiteter Anfragen wird über die Batchkonfiguration begrenzt.
-
-MongoDB wird als lokale Arbeits-, Transformations- und Evaluationsdatenbank eingesetzt. Das dokumentorientierte Datenmodell unterstützt die Speicherung der verschachtelten 
-Verarbeitungskontexte, die im Verlauf der Pipeline um Vorverarbeitungs-, Extraktions-, Validierungs-, Normalisierungs- und Bewertungsergebnisse ergänzt werden. Beanie übernimmt 
-die Abbildung der Dokumentmodelle, während Motor den asynchronen Datenbankzugriff bereitstellt. Die lokale Persistenz bleibt von der produktiven Datenhaltung getrennt. Transformierte 
-Produktdaten werden ausschließlich über die Ziel-API übergeben.
-
-Für die Eingabe stehen zwei technische Adapter zur Verfügung. FastAPI und Uvicorn realisieren die REST-Schnittstelle, während Click die kommandozeilenbasierte Ausführung mit 
-dateibasierten Eingaben ermöglicht. Beide Adapter überführen ihre Eingaben in dieselben internen Modelle und greifen über den gemeinsamen Eingangsport auf dieselben Anwendungsfälle zu. 
-Beautiful Soup wird für das Parsen und die strukturorientierte Bereinigung der HTML-Dokumente eingesetzt. Die Kommunikation mit Gemini erfolgt über das Google Gen AI SDK, während 
-HTTPX die asynchrone Anbindung der Ziel-API übernimmt.
-
-Die Quellcodestruktur bildet die in Kapitel 4 beschriebene Trennung der Verantwortlichkeiten ab. Der Bereich \texttt{core} enthält die Domänenmodelle, Filter, Pipelines, Prompts 
-und anwendungsinternen Services. Die unter \texttt{ports} definierten Schnittstellen beschreiben die vom Anwendungskern benötigten Ein- und Ausgangsfunktionen. Ihre konkreten 
-technischen Umsetzungen befinden sich unter \texttt{adapters}. Umgebungsabhängige Einstellungen werden im Konfigurationsbereich gekapselt. Die Zusammensetzung der Repositories, 
-Adapter, Filter, Pipelines und Services erfolgt zentral im Dependency Wiring, sodass die fachlichen Komponenten nicht selbst für die Erzeugung ihrer technischen Abhängigkeiten 
-verantwortlich sind.
+MongoDB dient als lokale Arbeits-, Transformations- und Evaluationsdatenbank. Das dokumentorientierte Modell unterstützt die Speicherung der verschachtelten 
+Verarbeitungskontexte, die während des Ablaufs schrittweise um Zwischen- und Ergebnisobjekte ergänzt werden. Beanie und Motor übernehmen die Abbildung und den 
+asynchronen Zugriff. Die Quellcodestruktur überführt die in Kapitel 4 beschriebene Architektur in die Verantwortungsbereiche \texttt{core}, \texttt{ports} und 
+\texttt{adapters}. Die Zusammensetzung der konkreten Repositories, Adapter, Filter und Services erfolgt zentral im Dependency Wiring.
 
 \subsection{Umsetzung der Transformationsverarbeitung}
 
-Die in Abschnitt 4.2.4 dargestellte zeitlich getrennte Verarbeitung wird durch mehrere request- und batchbezogene Teilpipelines umgesetzt. Der \texttt{TransformationService} 
-koordiniert deren Ausführung, verwaltet die persistenten Arbeitsobjekte und führt die Ergebnisse der getrennten Extraktionszweige zusammen. Die konkrete Verarbeitung gliedert 
-sich in die Vorbereitung einzelner Transformationsanfragen, die batchweite Einreichung der LLM-Anfragen, die regelbasierte Extraktion sowie die nachgelagerte Verarbeitung der 
-abgerufenen LLM-Ergebnisse. Eine einzelne durchgängige und synchrone Filterkette wird damit nicht gebildet.
+Die zeitlich getrennte LLM-Verarbeitung wird durch mehrere request- und batchbezogene Teilpipelines umgesetzt. Der \texttt{TransformationService} koordiniert deren 
+Ausführung, verwaltet die persistenten Arbeitsobjekte und führt die Ergebnisse der beiden Extraktionszweige zusammen.
 
 \subsubsection{Mehrphasige Pipelineausführung}
 
-Zu Beginn eines Transformationslaufs erzeugt der \texttt{TransformationService} zunächst einen \texttt{BatchRequest} im Zustand \texttt{CREATED} und speichert diesen in MongoDB. 
-Anschließend wird für jedes Eingabeobjekt ein eigener \texttt{TransformationRequest} angelegt und über seine Batchkennung dem übergeordneten Verarbeitungslauf zugeordnet. Erst 
-nachdem die internen Kennungen und Beziehungen persistiert wurden, wechselt der Batch in den Zustand \texttt{RUNNING} und die fachliche Verarbeitung beginnt. Dadurch sind die 
-ursprünglichen Eingaben bereits vor dem ersten Verarbeitungsschritt eindeutig adressierbar.
+Zu Beginn eines Transformationslaufs werden ein \texttt{BatchRequest} und die zugehörigen \texttt{TransformationRequest}-Objekte angelegt und vor dem ersten 
+Verarbeitungsschritt persistiert. Die requestbezogene Ausführung erfolgt über den \texttt{TransformationPipelineExecutor}. Dieser stellt die Anfragen in einer 
+\texttt{asyncio.Queue} bereit und verarbeitet sie mit einer konfigurierbaren Anzahl asynchroner Worker. Innerhalb einer Anfrage werden die Filter sequenziell 
+ausgeführt. Nach jedem Filter wird der aktualisierte Zustand gespeichert, sodass bereits erzeugte Zwischenstände bei einem späteren Fehler erhalten bleiben.
 
-Die requestbezogene Verarbeitung wird durch den \texttt{TransformationPipelineExecutor} ausgeführt. Dieser überführt die zu bearbeitenden Anfragen in eine \texttt{asyncio.Queue} und 
-erzeugt eine konfigurierbare Anzahl asynchroner Worker. Die Anzahl der Worker wird durch \texttt{max\_workers} begrenzt und zusätzlich an die Anzahl der tatsächlich vorhandenen 
-Transformationsanfragen angepasst. Innerhalb einer einzelnen Anfrage werden die Filter sequenziell ausgeführt, sodass das Ergebnis eines Filters als Eingabe des folgenden Schritts 
-dient. In den Vorbereitungs- und Nachverarbeitungspipelines wird der aktualisierte \texttt{TransformationRequest} nach jedem abgeschlossenen Filter persistiert. Damit bleiben bereits 
-erzeugte Zwischenstände auch dann erhalten, wenn ein späterer Verarbeitungsschritt fehlschlägt.
+Nach der HTML-Vorverarbeitung werden die batchweite LLM-Einreichung und die requestbezogene regelbasierte Extraktion als getrennte \texttt{asyncio}-Tasks gestartet. 
+Beide Zweige erhalten Kopien derselben vorverarbeiteten Anfragen. Nach ihrem Abschluss werden die regelbasierten Ergebnisse anhand der internen Request-ID mit den 
+Zuständen des LLM-Zweigs zusammengeführt und gemeinsam mit der externen Batchreferenz persistiert.
 
-Die initiale requestbezogene Pipeline enthält das HTML-Cleanup. Nach dessen Abschluss werden die LLM-Einreichung und die regelbasierte Extraktion als getrennte \texttt{asyncio}-Tasks 
-gestartet. Hierfür erhalten beide Zweige tiefe Kopien derselben vorverarbeiteten Transformationsanfragen. Die LLM-Einreichung wird als batchbezogene Pipeline ausgeführt, da die 
-geeigneten Anfragen gemeinsam an den externen Dienst übergeben werden. Der während dieser Ausführung erzeugte Batchkontext stellt unter anderem die Batchkennung und einen Snapshot der 
-verwendeten Konfiguration bereit. Dazu gehören das Modell, die Promptversion, die Temperatur und das Thinking-Budget.
-
-Die regelbasierte Extraktion arbeitet dagegen requestbezogen. Da diese Teilpipeline nur einen Extraktionsfilter enthält, wird sie für die einzelnen Anfragen direkt asynchron ausgeführt. 
-Nach Abschluss beider Zweige werden das regelbasierte Ergebnis und der zugehörige Pipelinekontext anhand der internen Request-ID in die vom LLM-Zweig zurückgegebenen Anfragen 
-übernommen. Anschließend werden die zusammengeführten Transformationsanfragen und die externe LLM-Batchreferenz persistiert. Die Ausführung ist damit fachlich parallel und asynchron 
-koordiniert, stellt jedoch keine parallele Berechnung über mehrere Prozessorkerne dar.
-
-Die LLM-Einreichung erzeugt zu diesem Zeitpunkt noch kein fachliches Produktergebnis. Die weitere Verarbeitung wird durch einen separaten Aufruf für den bereits persistierten 
-Batch gestartet. Dabei prüft der \texttt{LlmBatchStatusRefreshService} zunächst den Zustand des externen LLM-Batches. Liegen die Antworten vor, werden sie anhand der übermittelten 
-Request-IDs den ursprünglichen Transformationsanfragen zugeordnet und als Extraktionsergebnisse gespeichert. Nur Anfragen im Zustand \texttt{EXTRACTED} werden anschließend durch 
-die Nachverarbeitungspipeline geführt. Diese umfasst Schema-Validierung, Normalisierung, Produkt-Matching, Evaluation und Export. Die Umsetzung bildet somit die zeitliche 
-Trennung zwischen Einreichung und Ergebnisverarbeitung unmittelbar im Ablauf und in den persistenten Zuständen ab.
+Die weitere Verarbeitung beginnt durch einen separaten Aufruf für den bestehenden Batch. Ein Status-Service fragt den externen Gemini-Batch ab und ordnet verfügbare 
+Antworten den ursprünglichen Anfragen zu. Nur erfolgreich extrahierte Anfragen durchlaufen anschließend Schema-Validierung, Normalisierung, Produkt-Matching, Evaluation 
+und Export. Die Implementierung bildet damit die zeitliche Unterbrechung zwischen Einreichung und Ergebnisverarbeitung unmittelbar in den persistenten Arbeitsobjekten ab.
 
 \subsubsection{Gemeinsame HTML-Vorverarbeitung}
 
-Das HTML-Cleanup erzeugt die gemeinsame Eingabebasis für den LLM-basierten und den regelbasierten Extraktionszweig. Der zugehörige Filter verfolgt eine konservative 
-Bereinigungsstrategie: Technische und mit hinreichender Sicherheit irrelevante Inhalte werden entfernt, während potenziell produktbezogene Informationen und strukturelle 
-Hinweise erhalten bleiben. Eine fachliche Extraktion einzelner Produktattribute findet in diesem Schritt noch nicht statt.
+Das HTML-Cleanup erzeugt die gemeinsame Eingabebasis für beide Extraktionszweige. Der Filter entfernt technische und eindeutig irrelevante Inhalte, ohne bereits eine 
+fachliche Produktextraktion durchzuführen. Zunächst werden Metadaten wie Seitentitel, kanonische URL, Open-Graph-Angaben und Dokumentsprache erfasst. Anschließend werden 
+unter anderem Kommentare, Skripte, Styles, eingebettete Medien sowie eindeutig erkennbare Navigations-, Footer-, Cookie-, Such-, Warenkorb- und Trackingbereiche entfernt. 
+Uneindeutige und potenziell produktbezogene Inhalte bleiben erhalten.
 
-Zu Beginn werden seitenweite Metadaten ausgelesen. Hierzu gehören der Seitentitel, die kanonische URL, der Open-Graph-Titel, der Open-Graph-Seitenname und die Sprache des 
-HTML-Dokuments. Anschließend entfernt der Filter Kommentare sowie technische Elemente wie Skripte, Styles und eingebettete Medien. Weitere Bereiche werden anhand ihrer 
-HTML-Tags, IDs und Klassen nur dann verworfen, wenn sie eindeutig einer globalen Navigation, dem Footer, Cookie- und Consent-Dialogen, Such- und Warenkorbfunktionen, 
-Trackingelementen oder nicht produktbezogenen Empfehlungsbereichen zugeordnet werden können. Produktnahe oder uneindeutige Inhalte bleiben dagegen erhalten.
+Bild-Tags werden entfernt, vorhandene Alt-Texte jedoch als Text erhalten. IDs, bereinigte Klassen, semantische HTML-Attribute und ausgewählte fachlich relevante 
+\texttt{data-*}-Attribute bleiben bestehen. Leere Container werden verworfen. Für die abschließende Serialisierung wird nach Möglichkeit \texttt{main}, andernfalls 
+\texttt{article}, \texttt{body} oder das verbleibende Dokument verwendet. Eine feste Kürzung des Inhalts findet nicht statt.
 
-Bild-Tags werden aus dem HTML entfernt, da die Bilddaten bereits unabhängig davon Bestandteil der Eingabe sein können. Vorhandene Alt-Texte werden jedoch als Textknoten 
-erhalten, da sie fachlich relevante Bezeichnungen enthalten können. Danach reduziert der Filter die HTML-Attribute auf strukturell oder semantisch nutzbare Informationen. 
-IDs bleiben bestehen, während Klassen bereinigt und von Duplikaten befreit werden. Liegt neben einer BEM-Basisklasse eine spezifischere Modifier-Klasse vor, wird die 
-redundante Basisklasse entfernt. Zusätzlich bleiben unter anderem Attribute zur semantischen Auszeichnung sowie ausgewählte \texttt{data-*}-Attribute erhalten, sofern diese 
-nicht erkennbar der Darstellung, dem Tracking oder der JavaScript-Steuerung dienen.
-
-Nach der Attributbereinigung werden leere Container entfernt. Für die abschließende Serialisierung wählt der Filter nach Möglichkeit ein \texttt{main}-Element als semantischen 
-Wurzelbereich. Ist dieses nicht vorhanden, werden der Reihe nach \texttt{article}, \texttt{body} oder das vollständige verbleibende Dokument verwendet. Die Zwischenraumformatierung 
-wird vereinheitlicht, der Inhalt jedoch nicht durch ein festes Zeichenlimit gekürzt.
-
-Das erzeugte \texttt{PreprocessingResult} enthält neben den Metadaten und dem vorverarbeiteten HTML auch den ursprünglichen Umfang, die Anzahl entfernter Elemente, die 
-Reduktionsrate und den Verarbeitungszeitpunkt. Der Wert \texttt{preprocessed\_char\_count} bezeichnet dabei den Umfang der serialisierten Kombination aus Metadaten und 
-vorverarbeitetem HTML und nicht ausschließlich die Länge des HTML-Strings. Da beide Extraktionszweige auf genau diesem gespeicherten Ergebnis arbeiten, wird eine gemeinsame 
-und nachträglich rekonstruierbare Eingabegrundlage geschaffen.
+Das resultierende \texttt{PreprocessingResult} enthält die Metadaten, das vorverarbeitete HTML sowie Kennzahlen zur Reduktion. \texttt{preprocessed\_char\_count} 
+bezeichnet dabei den Umfang der serialisierten Kombination aus Metadaten und HTML und nicht ausschließlich die Länge des HTML-Strings. Beide Extraktionsansätze arbeiten 
+anschließend auf diesem persistent gespeicherten Ergebnis.
 
 \subsubsection{Status- und Fehlerbehandlung}
 
-Die technische Ausführung wird durch persistierte Pipelinekontexte dokumentiert. Für eine requestbezogene Pipeline enthält der \texttt{TransformationPipelineContext} neben 
-Start- und Abschlusszeitpunkt Metadaten zum Ausführungsmodus, zur Pipeline und zum verwendeten Worker. Für jeden Filter wird ein \texttt{FilterExecutionReport} mit Filtername, 
-Ausführungsstatus, Laufzeit und gegebenenfalls einer Fehlermeldung erzeugt. Batchbezogene Verarbeitungsschritte verwenden einen entsprechenden \texttt{BatchPipelineContext}, 
-der dem übergeordneten Batch zugeordnet wird.
+Pipelinekontexte dokumentieren Start- und Abschlusszeitpunkte sowie Status, Laufzeit und mögliche Fehlermeldungen der ausgeführten Filter. Eine unerwartete Ausnahme 
+innerhalb einer requestbezogenen Pipeline setzt nur die betroffene Anfrage auf \texttt{FAILED}. Die übrigen Worker setzen ihre Verarbeitung fort. Batchweite Fehler der 
+LLM-Einreichung können dagegen alle gemeinsam übermittelten Anfragen betreffen. Fachlich festgestellte Abweichungen werden, soweit möglich, als strukturierte Ergebnisobjekte 
+gespeichert.
 
-Tritt innerhalb einer requestbezogenen Pipeline eine unerwartete Ausnahme auf, wird der zugehörige Pipelinekontext abgeschlossen und dem betroffenen \texttt{TransformationRequest} 
-hinzugefügt. Die Anfrage wechselt anschließend in den Zustand \texttt{FAILED}, während die übrigen Worker weitere Anfragen desselben Batches verarbeiten. Eine Ausnahme innerhalb 
-der batchweiten LLM-Einreichung betrifft dagegen sämtliche zu diesem Zeitpunkt gemeinsam verarbeiteten Anfragen. Der Ausführungsfehler wird im Batchkontext gespeichert und die 
-betroffenen Requests werden als fehlgeschlagen markiert.
-
-Technische Ausnahmen sind von regulär erzeugten fachlichen Fehlerergebnissen zu unterscheiden. Beispielsweise können Schemaabweichungen oder Providerfehler als strukturierte 
-Ergebnisobjekte gespeichert werden, ohne dass sie zunächst als unbehandelte Ausnahme auftreten. Auch eine nicht durchführbare Evaluation ist vom operativen Produktergebnis 
-getrennt. Der \texttt{EvaluationFilter} ist deshalb so konfiguriert, dass ein Fehler dieses Schritts die nachfolgende Exportverarbeitung nicht grundsätzlich verhindert.
-
-Eine allgemeine Retry- oder Backoff-Logik ist nicht implementiert. Ebenso erfolgt keine automatische Fortsetzung durch einen Hintergrundprozess. Die Wiederaufnahme der Verarbeitung 
-nach Abschluss des externen LLM-Batches wird durch einen erneuten expliziten Aufruf ausgelöst, der auf den zuvor persistierten Zuständen und Zwischenresultaten aufbaut.
+Eine allgemeine Retry- oder Backoff-Logik sowie eine automatische Fortsetzung durch einen Hintergrundprozess sind nicht implementiert. Die Wiederaufnahme nach Abschluss 
+des externen LLM-Batches erfolgt durch einen erneuten expliziten Aufruf.
 
 \subsection{Umsetzung der LLM-basierten Extraktion}
+
+Die LLM-basierte Verarbeitung überführt den vorverarbeiteten Produktkontext in ein strukturiertes \texttt{ProductExtraction}-Objekt. Inhaltliche Promptdefinition, 
+technische Gemini-Anbindung und Antwortverarbeitung sind voneinander getrennt. Für die Untersuchung wird ausschließlich die Promptversion \texttt{v3} verwendet.
+
 \subsubsection{Promptverwaltung und Promptstrategie}
+
+Die Promptdefinition besteht aus Metadaten, einem Systemprompt und einem requestbezogenen Eingabeprompt. Der Systemprompt enthält den Extraktionsauftrag, das erwartete 
+Produktmodell und die attributbezogenen Regeln. Der Eingabeprompt ergänzt diese Definition um die Metadaten und das vorverarbeitete HTML einer einzelnen Anfrage. Die 
+verwendete Version wird zusammen mit den LLM-Metadaten gespeichert.
+
+Der \texttt{PromptTemplateRenderer} setzt die Laufzeitvariablen in die Promptdateien ein. Nicht auflösbare Platzhalter führen zum Abbruch der Prompt-Erstellung. Der 
+Eingabepayload enthält außerdem eine \texttt{domain\_id}, die das Modell unverändert zurückgeben soll. Sie dient ausschließlich der späteren Zuordnung und wird vor der 
+fachlichen Weiterverarbeitung aus dem Ergebnis entfernt.
+
+Der Systemprompt verfolgt eine schema-geführte JSON-Extraktion. Er beschreibt die erwartete Struktur der Produktkopfdaten, Zutaten, Nährwerte, Verpackungsgrößen und 
+Produktgruppen und begrenzt die verwendbaren Einheiten. Unbekannte Einzelwerte werden durch \texttt{null}, nicht vorhandene Listen durch leere Listen repräsentiert. 
+Globale Evidenzregeln untersagen die Ergänzung unbelegter Produktwerte und priorisieren produktnahe Informationen.
+
+Die attributbezogenen Regeln werden nach ihrer Komplexität unterschieden. Direkte Felder erhalten kompakte Vorgaben zur Quellenauswahl und Formatierung. Semantisch 
+mehrdeutige Felder werden durch positive und negative Beispiele abgegrenzt. Für verschachtelte oder fehleranfällige Strukturen enthält der Prompt zusätzlich eine 
+schrittweise Vorgehensweise. Diese Schritte werden innerhalb eines einzelnen LLM-Aufrufs verarbeitet und bilden keine technisch getrennte Promptkette. Eine abschließende 
+Prüfanweisung soll vor der Ausgabe Struktur, Felder und Einheiten kontrollieren. Die verbindliche technische Validierung erfolgt jedoch erst nach dem Abruf.
+
 \subsubsection{Attributbezogene Umsetzung}
+
+Die folgenden gekürzten Ausschnitte zeigen je ein Beispiel für die drei Attributgruppen. Die verwendeten Fälle stammen aus dem zugrunde liegenden Produktdatenbestand. Zur 
+Reduktion des Umfangs werden nur die für die jeweilige Entscheidung relevanten Felder dargestellt.
+
+Direkte Extraktionsfelder lassen sich bei eindeutiger Kennzeichnung ohne umfangreiche fachliche Abgrenzung übernehmen. Listing~\ref{lst:prompt-direkte-felder} zeigt dies 
+für Produktbezeichnung und EAN.
+
+\begin{lstlisting}[
+    caption={Gekürztes Promptbeispiel für direkte Extraktionsfelder},
+    label={lst:prompt-direkte-felder},
+    numbers=none,
+    basicstyle=\ttfamily\scriptsize,
+    breaklines=true,
+    aboveskip=0.4em,
+    belowskip=0.4em
+]
+Regeln:
+- product_or_service_title: eindeutige Produktueberschrift.
+- ean: EAN oder GTIN als String, nur wenn eindeutig vorhanden.
+
+Input:
+<h1>Bio Haferdrink Natur</h1>
+<span>GTIN: 4001234567890</span>
+
+Teilausgabe:
+{
+  "product_header_data": {
+    "product_or_service_title": "Bio Haferdrink Natur",
+    "ean": "4001234567890"
+  }
+}
+\end{lstlisting}
+
+Semantisch mehrdeutige Attribute erfordern zusätzliche Entscheidungsgrenzen. Dies betrifft beispielsweise die Abgrenzung von Marke und Anbieter, Verkaufspreis und 
+Grundpreis oder belegten und unbelegten Produkteigenschaften. Listing~\ref{lst:prompt-mehrdeutige-felder} verdeutlicht die getrennte Zuordnung von Marke und Organisation.
+
+\begin{lstlisting}[
+    caption={Gekürztes Promptbeispiel für semantisch mehrdeutige Felder},
+    label={lst:prompt-mehrdeutige-felder},
+    numbers=none,
+    basicstyle=\ttfamily\scriptsize,
+    breaklines=true,
+    aboveskip=0.4em,
+    belowskip=0.4em
+]
+Regeln:
+- brand_name bezeichnet die Produktmarke.
+- organization_name bezeichnet Haendler, Hersteller oder Anbieter.
+- Ein Shopname ist nicht automatisch die Produktmarke.
+
+Input:
+<span>Marke: Kornfeld</span>
+<span>Anbieter: Beispielmarkt GmbH</span>
+
+Teilausgabe:
+{
+  "product_header_data": {
+    "brand_name": "Kornfeld",
+    "organization_name": "Beispielmarkt GmbH"
+  }
+}
+\end{lstlisting}
+
+Auch boolesche Felder unterscheiden zwischen einer belegten positiven oder negativen Aussage und einem unbekannten Zustand. Das Vorkommen von Milch begründet 
+beispielsweise nicht automatisch \texttt{is\_lactose\_free = false}. Fehlt eine eindeutige Aussage, wird \texttt{null} ausgegeben.
+
+Komplexe Attribute wie Zutaten, Nährwerte und Verpackungsgrößen werden prozedural behandelt. Bei Zutaten werden zunächst der gekennzeichnete Zutatenbereich und der 
+Originaltext ermittelt. Danach werden Reihenfolge, Prozentwerte und Unterzutaten in verschachtelte Objekte überführt. Bei Nährwerten sind zunächst die Bezugsbasis und 
+anschließend die semantische Zuordnung der Tabellenwerte zu bestimmen.
+
+Für \texttt{ProductSizing} werden produktnahe Füllmengen und Varianten berücksichtigt, während Grundpreise, Versand- und Bruttogewichte sowie unvollständige 
+Verpackungsangaben ausgeschlossen werden. Bei Mehrfachpackungen entspricht das extrahierte Ergebnis der Größe einer einzelnen Einheit. Diese Definition wird auch im 
+regelbasierten Ansatz und in der Ground Truth verwendet.
+
+\begin{lstlisting}[
+    caption={Gekürztes Promptbeispiel für die komplexe Extraktion von ProductSizing},
+    label={lst:prompt-komplexe-felder},
+    numbers=none,
+    basicstyle=\ttfamily\scriptsize,
+    breaklines=true,
+    aboveskip=0.4em,
+    belowskip=0.4em
+]
+Regeln:
+- Verwende nur die produktbezogene Fuellmenge.
+- Verwende bei Mehrfachpackungen die Einzelgroesse.
+- Verwende Grundpreise nicht als ProductSizing.
+
+Input:
+<h1>Mini Riegel 6 x 25 g</h1>
+<span>Grundpreis: 1 kg = 19,96 EUR</span>
+
+Teilausgabe:
+{
+  "product_sizings": [{
+    "value": 25,
+    "unit": "g",
+    "original_value": "6 x 25 g",
+    "normalized_value": 25,
+    "normalized_unit": "g"
+  }]
+}
+\end{lstlisting}
+
+Die vom Modell ausgegebenen normalisierten Werte gelten zunächst als Bestandteil der LLM-Antwort. Die für die Evaluation verwendete Vereinheitlichung wird nach der 
+Schema-Validierung erneut deterministisch aus dem ursprünglichen Wert und der Einheit berechnet.
+
 \subsubsection{Batchanbindung und Antwortverarbeitung}
 
+Der \texttt{BatchLlmExtractionFilter} rendert für einen Batch einmal den gemeinsamen Systemprompt und erzeugt für jede Transformationsanfrage einen eigenen Eingabeprompt. 
+Der resultierende Payload enthält das Modell \texttt{gemini-2.5-flash}, die Promptversion sowie die verwendeten Generierungsparameter. Für die Extraktion werden die 
+Temperatur auf \texttt{0.0} und das Thinking-Budget auf \texttt{0} gesetzt und gemeinsam mit den Submission-Metadaten gespeichert.
+
+Der Gemini-Adapter übergibt den Systemprompt als \texttt{system\_instruction} und die requestbezogenen Daten als Benutzernachricht. 
+\texttt{response\_mime\_type = application/json} konfiguriert JSON als Antwortformat. Ein providerseitiges \texttt{response\_schema} wird nicht verwendet. Nach der Einreichung wird zunächst nur die externe Batchreferenz gespeichert. Die zugehörigen Anfragen wechseln bis zur Bereitstellung der Antworten in den Zustand \texttt{WAITING\_FOR\_LLM}.
+
+Beim späteren Abruf verarbeitet der Ergebnisadapter eingebettete Antworten oder eine JSONL-Datei. Die Zuordnung erfolgt nicht über die Reihenfolge, sondern über die zurückgegebene \texttt{domain\_id}. Der Antworttext wird zunächst direkt als JSON gelesen. Enthält er dennoch Markdown-Begrenzungen oder zusätzlichen Text, entfernt der Parser die Begrenzungen beziehungsweise sucht nach einem enthaltenen JSON-Objekt. Die unveränderte Providerantwort bleibt als \texttt{raw\_output} erhalten.
+
+Zusätzlich werden Eingabe-, Antwort-, Thinking- und Gesamttokens sowie die daraus berechneten Kosten gespeichert. Nach Entfernung der technischen Kennung liegt das Ergebnis zunächst als unvalidierte Datenstruktur vor. Erfolgreiches Parsing bestätigt daher nur die syntaktische Verarbeitbarkeit, nicht die Übereinstimmung mit dem internen Produktschema.
+
 \subsection{Umsetzung des regelbasierten Referenzansatzes}
+
+Der regelbasierte Referenzansatz extrahiert ausschließlich das Datenfeld \textit{ProductSizing}. Er verarbeitet dasselbe \texttt{PreprocessingResult} wie der LLM-Zweig und erzeugt deterministisch höchstens eine Verpackungsgröße. Die Implementierung orientiert sich an einer finite-state-inspirierten Kaskade, besitzt jedoch kein formal spezifiziertes Zustands- und Übergangsmodell. Das bereinigte HTML wird zunächst in normalisierten Fließtext überführt. DOM-Zonen, IDs und Klassen werden anschließend nicht mehr direkt ausgewertet.
+
 \subsubsection{Kandidatenerkennung}
+
+Die Tokenisierung unterscheidet Zahlen, die Einheiten \texttt{g}, \texttt{kg}, \texttt{ml} und \texttt{l}, Multiplikatoren, Verteilungsangaben und Verpackungsbegriffe. Sowohl deutsche als auch englische Dezimalschreibweisen werden berücksichtigt. Darauf aufbauend erkennt der Filter einfache Mengen wie \texttt{500 g}, Multipacks wie \texttt{6 x 250 ml} und Kombinationen aus Anzahl, Verpackungsbegriff und Einzelmenge wie \texttt{2 Beutel à 100 g}.
+
+Jeder Treffer wird mit Originaltext und Zeichenposition gespeichert. Duplikate an derselben Position werden entfernt, während gleichlautende Angaben an verschiedenen Positionen erhalten bleiben. Die formale Erkennung allein bestimmt noch nicht, ob eine Menge tatsächlich eine Verpackungsgröße darstellt.
+
 \subsubsection{Kontextbewertung und Ausschluss}
+
+Für jeden Kandidaten wird ein Kontextfenster von bis zu 90 Zeichen vor und nach dem Treffer untersucht. Positive Signale umfassen Inhalts- und Nettofüllmengenangaben, Verpackungsbegriffe sowie Multipack- und Verteilungsformulierungen. Negative Signale kennzeichnen unter anderem Grundpreise, Preis- und Pfandkontexte, Nährwertreferenzen, Portionsangaben und Formulierungen wie \textit{pro 100 g}.
+
+Enthält das Kontextfenster mindestens ein negatives Signal, wird der Kandidat unabhängig von gleichzeitig vorhandenen positiven Hinweisen als \texttt{negative} klassifiziert und ausgeschlossen. Kandidaten mit ausschließlich positiven Signalen werden als \texttt{positive}, Kandidaten ohne erkannte Signale als \texttt{neutral} eingestuft. Neutrale Kandidaten bleiben als Fallback in der weiteren Verarbeitung. Kontextklasse und gefundene Signale werden für die spätere Fehleranalyse im Pipelinekontext gespeichert.
+
 \subsubsection{Plausibilitätsprüfung und Konfliktlösung}
 
+Positive und neutrale Kandidaten werden in \texttt{ProductSizing}-Objekte überführt. Kilogramm werden in Gramm und Liter in Milliliter umgerechnet. Bei Multipacks wird die Einzelgröße verwendet. \texttt{6 x 250 ml} ergibt somit \texttt{250 ml}. Die vollständige Schreibweise bleibt im Feld \texttt{original\_value} erhalten, während der Multiplikator nicht separat gespeichert und kein Gesamtinhalt berechnet wird.
+
+Ein Kandidat wird verworfen, wenn sein Wert nicht positiv ist, keine unterstützte Einheit vorliegt oder der normalisierte Wert außerhalb des Bereichs von 1 bis 50.000 Gramm beziehungsweise Millilitern liegt. Die Grenzen bilden heuristische Plausibilitätsregeln.
+
+Verbleiben mehrere Kandidaten, erhalten positive Kandidaten einen Grundwert von 100 und neutrale Kandidaten einen Grundwert von 10. Inhalts- und Nettofüllmengenlabels erhöhen den Score um 30 Punkte, Verpackungsbegriffe um 20 Punkte und Hinweise auf Multipacks oder Einzelverteilungen um jeweils 15 Punkte. Die Sortierung erfolgt zuerst nach absteigendem Score und bei Gleichstand nach der Position im Text. Dadurch wird auch bei mehreren plausiblen Angaben deterministisch höchstens ein Ergebnis ausgewählt.
+
+Das \texttt{RuleBasedExtractionResult} enthält die ausgewählte Verpackungsgröße und die formal erkannten Rohkandidaten. Kontextklassen, Scores, ausgeschlossene Kandidaten und Entscheidungsgründe werden ergänzend im Pipelinekontext abgelegt. Das Ergebnis bleibt von der umfassenderen LLM-Extraktion getrennt und kann unabhängig mit derselben Ground Truth verglichen werden.
+
 \subsection{Validierung, Evaluationsunterstützung und Systemintegration}
+
+Die nachgelagerte Verarbeitung überführt die syntaktisch gelesene LLM-Antwort in einen validierten und vereinheitlichten Produktzustand. Rohantwort, validiertes Modell, normalisiertes Modell, Bewertung und Exportergebnis bleiben dabei als getrennte Ergebnisobjekte erhalten.
+
 \subsubsection{Schema-Validierung und Normalisierung}
+
+Der \texttt{SchemaValidationFilter} überführt die geparste Datenstruktur mithilfe der Pydantic-Methode \texttt{model\_validate} des Modells \texttt{ProductExtraction} in die interne Repräsentation. Geprüft werden insbesondere Datentypen, verschachtelte Teilmodelle und zulässige Enum-Werte. Abweichungen werden mit Datenpfad, Fehlertyp, Beschreibung und geliefertem Wert als strukturierte Validierungsfehler gespeichert. Kann kein gültiges \texttt{ProductExtraction}-Objekt erzeugt werden, endet die Verarbeitung der betroffenen Anfrage im Zustand \texttt{FAILED}. Eine erfolgreiche Schema-Prüfung bestätigt lediglich die technische Modellierbarkeit, nicht die inhaltliche Korrektheit oder Vollständigkeit.
+
+Die Validierungsfehler werden aus den von Pydantic gelieferten Fehlerdaten in interne Fehlerobjekte überführt. Hierdurch bleibt erkennbar, an welcher Position des verschachtelten Zielmodells eine Abweichung aufgetreten ist und welcher Wert diese ausgelöst hat. Gleichzeitig bleibt die unveränderte Providerantwort im \texttt{LlmExtractionResult} erhalten. Dadurch lassen sich Fehler des JSON-Parsings, strukturelle Schemaabweichungen und später festgestellte inhaltliche Fehler voneinander unterscheiden.
+
+Der \texttt{NormalizationFilter} verarbeitet eine tiefe Kopie des validierten Modells. Textfelder werden bereinigt, leere Werte in \texttt{null} überführt, der Nutri-Score vereinheitlicht und EAN-Angaben auf Ziffern reduziert. Numerische Werte werden gerundet und unterstützte Größen in gemeinsame Einheiten überführt. Verschachtelte Zutaten werden rekursiv verarbeitet. Für jedes \texttt{ProductSizing} werden \texttt{normalized\_value} und \texttt{normalized\_unit} erneut aus dem ursprünglichen Wert und der Einheit berechnet. Dadurch bleiben validierter und normalisierter Zustand getrennt nachvollziehbar.
+
+Die Normalisierung verändert ausschließlich die technische Repräsentation bereits extrahierter Werte. Sie ergänzt keine fehlenden Produktinformationen, löst keine semantischen Widersprüche auf und ersetzt keine fachliche Korrektur des LLM-Ergebnisses. Fehlt ein validiertes Produktmodell, wird stattdessen ein strukturiertes Fehlerergebnis gespeichert und die Anfrage nicht an die nachfolgenden Verarbeitungsschritte übergeben. Nach erfolgreicher Normalisierung wechselt sie in den Zustand \texttt{NORMALIZED}.
+
 \subsubsection{Technische Unterstützung der Evaluation}
+
+Der \texttt{EvaluationFilter} lädt die Ground Truth über die Kennung der ursprünglichen Eingabe und stellt ihr das normalisierte LLM-Ergebnis sowie das getrennt gespeicherte regelbasierte Ergebnis gegenüber. Die daraus erzeugten Einzelbewertungen werden am jeweiligen \texttt{TransformationRequest} persistiert. Kann keine auswertbare Referenz zugeordnet werden, wird dies einschließlich des Ausschlussgrundes ebenfalls im Bewertungsergebnis dokumentiert. Die konkrete Festlegung der auswertbaren Referenzfälle, Vergleichsregeln, Metriken und Fehlerkategorien erfolgt in Kapitel 6.
+
+Die requestbezogene Bewertung wird erst nach erfolgreicher Normalisierung und erfolgreichem Produkt-Matching ausgeführt. Anfragen, die bereits beim Parsing, bei der Schema-Validierung oder in einem anderen verpflichtenden Verarbeitungsschritt scheitern, erreichen diesen Filter daher nicht. Ihre Fehler gehen nicht in die methodenspezifische Qualitätsbewertung ein, bleiben jedoch über die technischen Status- und Batchkennzahlen sichtbar.
+
+Ein Aggregationsservice fasst die Einzelbewertungen zusammen und ergänzt sie um technische Verarbeitungskennzahlen. Hierzu gehören unter anderem Parsing-, Schema- und Normalisierungsstatus, Laufzeiten, Tokenverbrauch und Kosten. Da Eingaben, Vorhersagen, Referenzdaten und Einzelbewertungen persistent gespeichert sind, kann die Batchbewertung erneut berechnet werden, ohne die LLM- oder Regelverarbeitung zu wiederholen. Der dateibasierte Export erzeugt daraus JSON-, CSV-, Grafik- und Markdown-Artefakte. Diese Dateien bilden keine zusätzliche führende Datenquelle.
+
+Die Evaluation verändert den operativen Status einer erfolgreich transformierten Anfrage nicht. Der Filter ist mit \texttt{continue\_on\_error} konfiguriert, sodass ein technischer Bewertungsfehler den anschließenden Produktexport nicht grundsätzlich verhindert.
+
 \subsubsection{Nachgelagerte Integration}
+
+Nach der Normalisierung gleicht der \texttt{ProductMatchingFilter} das extrahierte Produkt mit den lokal gespeicherten Produktdaten ab. Die Kandidatensuche berücksichtigt EAN-Angaben, aus der Produktbezeichnung abgeleitete Suchanfragen und bis zu drei Produktgruppen. Mehrfach gefundene Produkte werden über ihre interne Kennung zusammengeführt, anhand von Titel, Marke, EAN, Produktgruppe und Verpackungsgröße bewertet und auf höchstens 15 Kandidaten begrenzt.
+
+Ein exakter EAN-Treffer wird unmittelbar übernommen. Bei mehreren nicht eindeutigen Kandidaten erhält der synchrone Gemini-Aufruf ausschließlich die zuvor ermittelten Produktkandidaten und darf nur eine ihrer Kennungen auswählen. Dadurch erweitert das Sprachmodell nicht eigenständig den Suchraum. Liefert es keine gültige Kandidatenkennung oder wurden bereits durch die Vorauswahl keine Kandidaten gefunden, wird ein neues lokales Produktobjekt angelegt.
+
+Bei der Zuordnung zu einem bestehenden Produkt werden die neu extrahierten Angaben mit dem lokal gespeicherten Arbeitsobjekt zusammengeführt. Neue EANs, Produktgruppen und Verpackungsgrößen werden ergänzt, während vorhandene Werte erhalten bleiben, sofern die Extraktion keinen neuen Wert bereitstellt. Dieses lokale Produkt dient ausschließlich dem Matching und der Vorbereitung des Exports. Es ist nicht mit dem produktiv gespeicherten Datensatz des Zielsystems gleichzusetzen.
+
+Der abschließende \texttt{ExportFilter} lädt das zugeordnete lokale Produkt und übergibt es gemeinsam mit der Transformationsanfrage an den Produktexport-Port. Ein separater Mapper bildet die interne Darstellung auf das erwartete JSON-LD-Zielobjekt ab. Dadurch bleiben die fachlichen Modelle von den Bezeichnern und Verschachtelungen des externen Schemas getrennt. Der erzeugte Ziel-Payload sowie die technische Antwort der Ziel-API werden im \texttt{ExportResult} gespeichert.
+
+Eine erfolgreiche Antwort der Ziel-API führt zum Zustand \texttt{EXPORTED}. Kommunikationsfehler, abgelehnte Antworten oder fehlende Matching-Daten führen dagegen zu \texttt{FAILED}. Ein direkter Zugriff auf die produktive Datenbank erfolgt nicht. Die abschließende Validierung und produktive Persistierung verbleiben in der Verantwortung der Ziel-API. Evaluationsdaten werden weder in das Produktobjekt aufgenommen noch an diese Schnittstelle übertragen.
+
+Die Implementierung schafft damit eine gemeinsame und nachvollziehbare Ausführungsgrundlage für die nachfolgende Untersuchung. Beide Extraktionsansätze verwenden denselben vorverarbeiteten Produktkontext und dieselbe Definition der Verpackungsgröße, während ihre Ergebnisse getrennt gespeichert werden. Die technische Validierung, Normalisierung und Erfassung der Ausführungsdaten ermöglichen es, Extraktionsqualität und Verarbeitbarkeit in Kapitel 6 getrennt zu bewerten.

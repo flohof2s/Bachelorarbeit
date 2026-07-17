@@ -1,18 +1,151 @@
-% 2.1 Grundlegende Begriffsdefinitionen
-% - Definition der Schlüsselbegriffe aus dem Kontext der Arbeit, die für das
-% weitere Verständnis notwendig sind
-% - Allgemein technische Vorkenntnisse des Lesers voraussetzen!
-% - Begriffsdefinitionen werden wörtlich zitiert („ ...“) mit exakter Quellenangabe
-% (siehe Abschnitt Quellenarbeit)
-% - ggf. Ableitung eigener Begriffsdefinitionen
-\subsection{Begriffliche Grundlagen und Datenqualität}
+Die automatisierte Überführung heterogener Webdaten in ein vorgegebenes Zielschema verbindet Aufgaben der Informationsextraktion, semantischen Zuordnung, Transformation und Qualitätssicherung. Produktinformationen müssen innerhalb schwach strukturierter Quellen erkannt, den Attributen eines Zielmodells zugeordnet und in eine technisch verarbeitbare Repräsentation überführt werden. Diese Aufgaben sind dem Bereich der Datenintegration zuzuordnen, der sich mit strukturellen und semantischen Unterschieden zwischen Quell- und Zielsystemen befasst \cite{doan2012principles}.
 
-\subsection{Technologische Grundlagen}
+Für die Informationsextraktion stehen regelbasierte und lernbasierte Verfahren zur Verfügung. Klassische Web-Wrapper und heuristische Ansätze bilden erwartete Strukturen und fachliche Zusammenhänge durch explizite Regeln ab, während große Sprachmodelle heterogene Informationen anhand sprachlicher Anweisungen und ihres Kontexts verarbeiten können \cite{ferrara2014web,data_extraction_ai}. Die Ergebnisse beider Verfahrensklassen sind hinsichtlich ihrer fachlichen Qualität, strukturellen Konformität und technischen Verarbeitbarkeit zu bewerten. Das Kapitel führt hierzu zunächst die relevanten Grundlagen der Datenintegration und Informationsextraktion ein. Anschließend werden regelbasierte sowie LLM-basierte Extraktionsverfahren, Evaluationsgrundlagen und verwandte Arbeiten betrachtet.
 
-% 2.2 – 2.n-1 Kurze Erläuterung von n-1 bestehenden Ansätzen
-% - Konkurrierende Ansätze: Ansätze, die in Konkurrenz zum eigenen Thema
-% stehen
-% - Komplementäre Ansätze: Ansätze, die in der Arbeit verwendet werden / auf
-% denen aufgesetzt wird
-% - weitere Ansätze aus dem Themenfeld (z. B. aus der Praxis)
-\subsection{Verwandte Arbeiten und Identifikation der Forschungslücken}
+\subsection{Datenintegration und Datenqualität}
+
+Die Transformation von Webdaten setzt eine Unterscheidung zwischen der technischen Struktur eines Dokuments, der fachlichen Struktur seiner Inhalte und der Qualität des erzeugten Ergebnisses voraus. HTML-Dokumente besitzen zwar eine hierarchische Struktur, ihre Produktinformationen folgen jedoch nicht zwangsläufig einem einheitlichen fachlichen Modell. Für ihre Überführung in ein Zielschema müssen relevante Inhalte daher erkannt, zugeordnet, vereinheitlicht und geprüft werden.
+
+\subsubsection{Heterogene und schwach strukturierte Webdaten}
+
+Strukturierte Daten folgen einem expliziten Schema, das Attribute, Datentypen und Beziehungen festlegt. Unstrukturierte Daten besitzen demgegenüber keine unmittelbar maschinell nutzbare fachliche Gliederung. Semistrukturierte Daten enthalten Markierungen oder Hierarchien, deren konkrete Ausprägung jedoch zwischen Dokumenten variieren kann. HTML-Dokumente sind dieser Zwischenform zuzuordnen: Ihre Elemente bilden eine technische Dokumentstruktur, gewährleisten aber keine einheitliche fachliche Repräsentation der enthaltenen Produktinformationen \cite{doan2012principles,ferrara2014web}.
+
+Produktattribute können in Überschriften, Tabellen, Listen, frei formulierten Texten, Elementattributen oder eingebetteten Metadaten auftreten. Dieselbe Information kann abhängig von Quelle und Produkt unter unterschiedlichen Bezeichnungen, an verschiedenen Positionen und mit abweichender Granularität dargestellt werden. Zusätzlich enthalten Webseiten Navigationselemente, Shopinformationen, Empfehlungen und weitere Inhalte, die nicht unmittelbar zum betrachteten Produkt gehören. Die Heterogenität betrifft damit sowohl die Struktur als auch die Benennung und semantische Eindeutigkeit der Informationen.
+
+Für eine explizitere maschinelle Kennzeichnung von Webinhalten stehen Vokabulare und Serialisierungsformen für strukturierte Daten zur Verfügung. Schema.org stellt hierzu ein gemeinsames Vokabular bereit, das unter anderem über Microdata, RDFa oder JSON-LD eingebunden werden kann \cite{guha2016schema}. Untersuchungen größerer Webkorpora zeigen eine verbreitete, jedoch heterogene Nutzung entsprechender Auszeichnungen \cite{meusel2015web}. Ihre Verfügbarkeit beseitigt das Integrationsproblem nicht vollständig, da Webseiten nur Teile ihrer Inhalte auszeichnen oder unterschiedliche Detailgrade verwenden können.
+
+Der Begriff \emph{schwach strukturiert} bezeichnet in dieser Arbeit daher nicht das Fehlen einer technischen Dokumentstruktur. Gemeint ist, dass die fachlich relevanten Produktinformationen nicht durchgängig in einer einheitlichen und unmittelbar auf das Zielschema übertragbaren Form vorliegen.
+
+\subsubsection{Datenintegration, Schema-Mapping und Transformation}
+
+Datenintegration verfolgt das Ziel, Informationen aus heterogenen Quellen in einer gemeinsamen Repräsentation nutzbar zu machen. Syntaktische Heterogenität betrifft unterschiedliche Formate und Schreibweisen. Strukturelle Heterogenität liegt vor, wenn vergleichbare Informationen in abweichenden Dokument- oder Objektstrukturen repräsentiert werden. Semantische Heterogenität entsteht, wenn dieselben Sachverhalte unterschiedlich bezeichnet werden oder gleich bezeichnete Elemente verschiedene Bedeutungen besitzen \cite{doan2012principles}.
+
+Bei schwach strukturierten Webdaten beginnt die Integration mit der Informationsextraktion. Sie identifiziert fachlich relevante Inhalte und überführt sie in explizite Attribute oder Objekte. Die Erkennung einer Zeichenfolge allein bestimmt jedoch noch nicht ihre Bedeutung im Zielmodell. Diese ergibt sich häufig erst aus ihrer Bezeichnung und ihrem Kontext.
+
+Schema-Matching bezeichnet die Identifikation semantischer Entsprechungen zwischen Elementen unterschiedlicher Schemata. Schema-Mapping beschreibt darauf aufbauend die Abbildung von Daten aus einer Quell- in eine Zielrepräsentation \cite{doan2012principles}. Bei Webseiten liegt allerdings häufig kein einheitliches fachliches Quellschema vor. Die Abbildung auf das Zielmodell umfasst deshalb zunächst die Extraktion und Interpretation der Informationen, bevor sie einem Zielattribut zugeordnet werden können.
+
+Die Transformation überführt die erkannten und zugeordneten Informationen in die verlangte Struktur. Sie kann Datentypen, Objektverschachtelungen und Wertedarstellungen verändern, ohne die fachliche Bedeutung der Daten zu ändern. Die Normalisierung vereinheitlicht dabei vergleichbare Repräsentationen, beispielsweise Schreibweisen oder kompatible Maßeinheiten. Sie ist von einer fachlichen Ergänzung oder Korrektur abzugrenzen und darf keine in der Quelle fehlenden Informationen erzeugen.
+
+Validierung prüft, ob ein Ergebnis definierte Anforderungen erfüllt. Eine Schema-Validierung kontrolliert insbesondere Felder, Datentypen, zulässige Werte und Verschachtelungen. Sie bestätigt jedoch nicht, dass die enthaltenen Werte fachlich korrekt oder vollständig sind. Informationsextraktion, Zuordnung, Transformation, Normalisierung und Validierung bilden damit unterscheidbare Aufgaben innerhalb des Integrationsprozesses.
+
+\subsubsection{Relevante Dimensionen der Datenqualität}
+
+Datenqualität beschreibt die Eignung von Daten für einen vorgesehenen Verwendungszweck und umfasst mehrere voneinander unterscheidbare Dimensionen. Wang und Strong differenzieren intrinsische, kontextbezogene, repräsentationsbezogene und zugriffsbezogene Qualität. Zu den dabei betrachteten Dimensionen gehören unter anderem Korrektheit, Vollständigkeit, Relevanz und konsistente Repräsentation \cite{wang1996beyond}. Batini und Scannapieco ordnen entsprechende Dimensionen in Verfahren zur Messung und Verbesserung von Datenqualität ein \cite{batini2016data}.
+
+Die \emph{Korrektheit} beschreibt, inwieweit ein extrahierter Wert dem als Referenz festgelegten Sachverhalt entspricht. Neben dem dargestellten Wert sind dabei seine fachliche Zuordnung und gegebenenfalls die verwendete Einheit zu berücksichtigen. Ein formal korrekt erkannter Wert ist fachlich falsch, wenn er dem falschen Produktattribut zugeordnet wird.
+
+Die \emph{Vollständigkeit} bezeichnet den Anteil der relevanten und in der Quelle vorhandenen Informationen, die in das Ergebnis übernommen werden. Ein fehlender Zielwert stellt allerdings keinen Extraktionsfehler dar, wenn die entsprechende Information in der Quelle nicht vorhanden oder nicht eindeutig belegt ist. Für eine Bewertung muss deshalb festgelegt werden, welche Informationen tatsächlich erwartet werden.
+
+Die \emph{Relevanz} betrifft die Beschränkung auf Informationen, die zum betrachteten Produkt und Zielattribut gehören. Ein Ergebnis kann vollständig sein und dennoch zusätzliche, fachlich unpassende Werte enthalten. Vollständigkeit und Relevanz sind daher getrennt zu bewerten.
+
+Die \emph{Repräsentationskonsistenz} beschreibt die einheitliche Darstellung vergleichbarer Inhalte. Gleichartige Werte sollten konsistente Datentypen, Formate und Einheiten verwenden. Zugleich muss ihre Bedeutung für die weitere Verarbeitung interpretierbar bleiben \cite{wang1996beyond,batini2016data}.
+
+Von diesen fachlichen Qualitätsdimensionen ist die \emph{Schema-Konformität} zu unterscheiden. Sie bezeichnet die technische Übereinstimmung eines Ergebnisses mit dem definierten Datenmodell. Ein schema-konformes Objekt kann dennoch falsche oder unvollständige Werte enthalten. Ebenso bestätigt ein syntaktisch parsebares JSON-Objekt noch keine Schema-Konformität. Für die spätere Evaluation sind daher syntaktische Verarbeitbarkeit, strukturelle Konformität und fachliche Extraktionsqualität getrennt zu erfassen.
+
+\subsection{Informationsextraktion aus Web- und Produktdaten}
+
+Informationsextraktionsverfahren identifizieren relevante Inhalte innerhalb eines Dokuments und überführen sie in eine strukturierte Repräsentation. Dafür können sowohl die Dokumentstruktur als auch formale, sprachliche und kontextbezogene Merkmale ausgewertet werden. Im Folgenden werden zunächst die grundlegenden Aufgaben der Informationsextraktion und anschließend regelbasierte sowie kaskadierte Verfahren betrachtet.
+
+\subsubsection{Grundlagen der Informationsextraktion}
+
+Informationsextraktion bezeichnet die Erkennung vordefinierter Entitäten, Attribute oder Beziehungen in unstrukturierten beziehungsweise schwach strukturierten Quellen. Im Unterschied zum Information Retrieval werden nicht primär relevante Dokumente gesucht, sondern konkrete Informationen innerhalb eines vorliegenden Dokuments identifiziert und fachlich klassifiziert.
+
+Web Data Extraction überträgt diese Aufgabe auf Webseiten. Neben dem sichtbaren Text können HTML-Hierarchien, Elementattribute, wiederkehrende Strukturen und eingebettete Metadaten ausgewertet werden. Ferrara et al. unterscheiden hierfür unter anderem manuell definierte, wrapperbasierte und lernbasierte Verfahren \cite{ferrara2014web}.
+
+Bei der Produktattributextraktion wird der erwartete Informationsraum durch ein Produktmodell vorgegeben. Die Aufgabe besteht nicht nur darin, einen Wert zu lokalisieren, sondern auch seine fachliche Bedeutung zu bestimmen und ihn einem Zielattribut zuzuordnen. Formal ähnliche Angaben können abhängig vom Kontext unterschiedliche Sachverhalte repräsentieren.
+
+Named-Entity Recognition bildet eine mögliche Teilaufgabe der Informationsextraktion. Sie identifiziert Textsegmente und ordnet sie festgelegten Entitätsklassen zu. Eine vollständige Produkttransformation erfordert darüber hinaus häufig die Abbildung auf verschachtelte Zielobjekte, die Verarbeitung von Einheiten sowie die Auflösung konkurrierender Angaben.
+
+Der Extraktionsprozess lässt sich analytisch in Kandidatenerkennung, fachliche Klassifikation, Konfliktlösung und strukturierte Ausgabe gliedern. Diese Aufgaben können durch explizite Regeln, lernbasierte Modelle oder Kombinationen mehrerer Verfahren umgesetzt werden.
+
+\subsubsection{Regelbasierte und kaskadierte Extraktionsverfahren}
+
+Regelbasierte Extraktionsverfahren bilden Wissen über erwartete Datenformen und fachliche Zusammenhänge in expliziten Regeln ab. Diese können sich auf Dokumentstrukturen, Zeichenmuster, Schlüsselwörter oder den sprachlichen Kontext beziehen. Bei identischer Eingabe und unverändertem Regelwerk erzeugen sie grundsätzlich nachvollziehbare und reproduzierbare Ergebnisse.
+
+Strukturbezogene Wrapper verwenden beispielsweise DOM-Hierarchien, HTML-Tags oder XPath-Ausdrücke. Sie eignen sich besonders für Quellen mit wiederkehrenden und stabilen Seitenstrukturen. Musterbasierte Verfahren erkennen charakteristische Zeichenfolgen, etwa Kombinationen aus Zahlen, Multiplikatoren und Maßeinheiten. Kontextregeln ergänzen solche Treffer um positive oder negative Hinweise aus ihrer Umgebung \cite{ferrara2014web}.
+
+Regelbasierte Verfahren benötigen für klar abgegrenzte Aufgaben nicht zwangsläufig einen annotierten Trainingsdatensatz und ermöglichen die explizite Modellierung fachlicher Ausschlussbedingungen. Ihre Abdeckung hängt jedoch unmittelbar von den berücksichtigten Mustern und Sonderfällen ab. Veränderte Webseiten, neue Schreibweisen oder bislang unbekannte Kontexte können Anpassungen des Regelwerks erforderlich machen. Ferrara et al. betrachten die Wartung daher als wesentliche Phase des Lebenszyklus eines Web-Wrappers \cite{ferrara2014web}.
+
+Komplexere Aufgaben lassen sich häufig nicht durch ein einzelnes Muster lösen. Formale Treffer müssen zusammengesetzt, kontextbezogen bewertet und bei konkurrierenden Kandidaten priorisiert werden. Kaskadierte Verfahren zerlegen diese Verarbeitung in aufeinander aufbauende Stufen, deren Ergebnisse schrittweise zu einer fachlich spezifischen Repräsentation verdichtet werden.
+
+Ein etabliertes Beispiel ist FASTUS. Das System organisiert die Informationsextraktion aus natürlichsprachlichen Texten als Kaskade endlicher Zustandsverfahren. Die ursprüngliche Architektur umfasst fünf Stufen: die Erkennung von Namen und festen Ausdrücken, die Identifikation grundlegender sprachlicher Gruppen, deren Verbindung zu komplexeren Phrasen, die Erkennung domänenspezifischer Ereignismuster und die Zusammenführung zusammengehöriger Repräsentationen \cite{hobbs1997fastus}. Frühe Stufen verarbeiten damit lokale und vergleichsweise allgemeine Strukturen, während spätere Stufen fachliche Zusammenhänge und strukturierte Ergebnisse erzeugen.
+
+Das Kaskadenprinzip lässt sich auf feldspezifische Extraktionsaufgaben übertragen. Nach einer Vereinheitlichung der Eingabe können zunächst formale Kandidaten erkannt werden. Weitere Stufen bewerten deren Kontext, verwerfen unplausible Treffer, erzeugen fachliche Zielobjekte und lösen Konflikte zwischen mehreren Kandidaten.
+
+Der regelbasierte Referenzansatz dieser Arbeit ist von diesem Prinzip inspiriert. Er stellt jedoch keine vollständige Implementierung von FASTUS oder eines formal spezifizierten Finite-State-Transducers dar. Insbesondere erfolgen keine allgemeine syntaktische Analyse und keine Ereignisextraktion. Übernommen wird die stufenweise Verdichtung formaler Treffer zu einer domänenspezifischen Repräsentation für das Referenzfeld \emph{ProductSizing}.
+
+Regelbasierte Ansätze werden auch in der Lebensmitteldomäne eingesetzt. FoodIE kombiniert Vorverarbeitung, sprachliche Merkmale und Regeln zur Erkennung mehrteiliger Lebensmittelentitäten \cite{popovski2019foodie}. Akhtar et al. verbinden dagegen strukturelle und visuelle Merkmale zur Extraktion von Produktdaten aus E-Commerce-Webseiten \cite{akhtar2020efficient}. Beide Arbeiten verdeutlichen die Bandbreite regelbasierter Verfahren, unterscheiden sich jedoch hinsichtlich Datenquelle, Zielattributen und Verarbeitung von dem hier untersuchten Referenzansatz.
+
+\subsubsection{Herausforderungen lebensmittelbezogener Produkt- und Mengenangaben}
+
+Lebensmittelbezogene Produktinformationen können in unterschiedlichen Textbereichen und sprachlichen Formen auftreten. Produktbezeichnungen, Zutaten und Eigenschaften bestehen aus einzelnen Begriffen oder mehrteiligen Phrasen und können durch Angaben zu Sorte, Zustand oder Zusammensetzung ergänzt werden. Arbeiten zur Informationsextraktion in dieser Domäne verweisen sowohl auf diese sprachliche Variabilität als auch auf die begrenzte Verfügbarkeit spezialisierter annotierter Datensätze \cite{popovski2020survey}.
+
+Bei Produktattributen ist ein formal passender Textwert nicht zwangsläufig dem gesuchten fachlichen Attribut zuzuordnen. Marken-, Hersteller- und Händlerangaben können gemeinsam auftreten. Ebenso können Mengen sowohl das Produkt selbst als auch Referenz-, Preis-, Portions- oder Nährwertangaben beschreiben. Ein Extraktionsverfahren muss daher zwischen vorhandener Evidenz, fehlenden Informationen und konkurrierenden Bedeutungen unterscheiden.
+
+Mengenangaben bestehen typischerweise aus einem numerischen Wert, einer Einheit und gegebenenfalls einem Multiplikator oder Verpackungsbegriff. Auf derselben Produktseite können Verpackungsgröße, Nährwertreferenz, Portionsmenge, Grundpreisbezug und Versandgewicht vorkommen. Bei Mehrfachpackungen sind außerdem Anzahl, Einzelgröße und Gesamtinhalt voneinander zu unterscheiden.
+
+Gewicht, Volumen und Stückzahl bilden unterschiedliche Einheitendimensionen. Werte derselben Dimension können für einen Vergleich normalisiert werden, während eine Umrechnung zwischen unterschiedlichen Dimensionen zusätzliche fachliche Annahmen erfordern würde. Arici et al. zeigen für die Extraktion von Produktmengen zur Grundpreisberechnung, dass relevante Angaben über mehrere Produktfelder verteilt sein können und sowohl die passende Dimension als auch die zum Produkt gehörende Menge bestimmt werden müssen \cite{arici2021priceperunit}.
+
+Das Referenzfeld \emph{ProductSizing} besitzt damit eine begrenzte Zielstruktur, erfordert jedoch mehr als die Erkennung einer Zahl-Einheit-Kombination. Notwendig sind Kontextbewertung, Ausschluss konkurrierender Mengenarten, Behandlung von Mehrfachpackungen, Normalisierung und Konfliktlösung. Die konkrete Definition des Referenzwertes und der unterstützten Einheiten ist eine projektspezifische Festlegung und wird in den nachfolgenden Kapiteln beschrieben.
+
+\subsection{LLM-basierte strukturierte Informationsextraktion}
+
+Große Sprachmodelle können heterogene sprachliche und strukturelle Hinweise innerhalb eines gemeinsamen Eingabekontexts verarbeiten. Die Extraktionsaufgabe wird dabei durch natürlichsprachliche Anweisungen, eine Zielstruktur und gegebenenfalls Beispiele beschrieben. Die erzeugte Antwort bleibt jedoch eine modellabhängige Ausgabe, deren syntaktische, strukturelle und fachliche Qualität separat geprüft werden muss.
+
+\subsubsection{Relevante Eigenschaften großer Sprachmodelle}
+
+Autoregressive Sprachmodelle erzeugen ihre Ausgabe schrittweise auf Grundlage des bereitgestellten Kontexts und der bereits generierten Textteile. Der Prompt beschreibt die zu bearbeitende Aufgabe und legt damit den unmittelbaren Verarbeitungskontext fest. Ein vortrainiertes Modell kann dadurch neue Aufgaben bearbeiten, ohne für jedes Zielattribut erneut trainiert zu werden.
+
+Brown et al. zeigen, dass Aufgaben und Beispiele ausschließlich innerhalb des Eingabekontexts bereitgestellt werden können \cite{brown2020language}. Dieses \emph{In-Context Learning} verändert nicht die Modellparameter. Bei Zero-Shot-Prompting erhält das Modell nur eine Aufgabenbeschreibung. One-Shot- und Few-Shot-Konfigurationen ergänzen ein beziehungsweise mehrere Beispiele.
+
+Für die Informationsextraktion können über den Prompt die gesuchten Attribute, ihre Abgrenzung und das gewünschte Ausgabeformat beschrieben werden. Beispiele veranschaulichen dabei erwartete Zuordnungen und Entscheidungsgrenzen. Sie stellen jedoch keine fest programmierten Regeln dar. Ob das Modell die dargestellte Logik auf neue Eingaben überträgt, muss empirisch geprüft werden.
+
+Eine relevante Eigenschaft ist die gemeinsame Verarbeitung formaler und sprachlicher Hinweise. Ein Wert kann zusammen mit seinem Kontext betrachtet und dadurch abhängig von seiner Einbettung unterschiedlich klassifiziert werden. Dies ist insbesondere für Attribute hilfreich, die weder durch ein eindeutiges Schlüsselwort noch durch eine stabile Position gekennzeichnet sind.
+
+Die Ausgabe bleibt dennoch von Modell, Prompt, Eingabe und Generierungsparametern abhängig. Änderungen an Formulierungen, Beispielen oder Reihenfolgen können die Ergebnisse beeinflussen. Brunschwiler et al. zeigen, dass sich die Wirkung von Zero- und Few-Shot-Konfigurationen zwischen Extraktionskategorien unterscheidet und zusätzliche Beispiele nicht für jedes Attribut zu einer Verbesserung führen \cite{brunschwiler2025enhancing}. Die Eignung eines LLM-basierten Ansatzes ist daher attribut- und datensatzspezifisch zu bewerten.
+
+\subsubsection{Schema-geführte Extraktion und strukturierte Ausgaben}
+
+Bei der schema-geführten Extraktion wird die erwartete Ergebnisstruktur als Bestandteil der Aufgabenbeschreibung festgelegt. Das Schema beschreibt die gesuchten Attribute, ihre Datentypen, mögliche Verschachtelungen und zulässige Werte. Das Modell soll relevante Informationen dadurch nicht als freie Zusammenfassung, sondern unmittelbar in einer vorgegebenen Repräsentation ausgeben.
+
+Caufield et al. verwenden mit SPIRES nutzerdefinierte und verschachtelte Schemata zur strukturierten Extraktion aus Texten \cite{caufield2024spires}. Die erzeugten Werte werden anschließend mithilfe externer Ressourcen geprüft und vereinheitlicht. Der Ansatz verdeutlicht die Trennung zwischen semantischer Extraktion durch das Modell und nachgelagerter Validierung.
+
+Ein Extraktionsschema begrenzt zunächst den erwarteten Informationsraum. Es legt fest, welche Attribute befüllt werden sollen und wie ihre Beziehungen darzustellen sind. Darüber hinaus kann es zulässige Einheiten, Wertemengen oder Repräsentationen fehlender Informationen vorgeben. Moundas et al. beschreiben hierfür wiederverwendbare Promptmuster, die Attribute, Bedingungen und verschachtelte Ausgabestrukturen kombinieren \cite{moundas2025promptpatterns}.
+
+Eine strukturierte Ausgabe ist nicht automatisch schema-konform. Syntaktisch gültiges JSON kann unerwartete Felder, falsche Datentypen oder abweichende Verschachtelungen enthalten. Ebenso bestätigt die Schema-Konformität nicht die fachliche Korrektheit eines Wertes. Die in Abschnitt 3.1.3 eingeführten Ebenen der Parsebarkeit, strukturellen Konformität und fachlichen Qualität bleiben daher getrennt zu prüfen.
+
+Das Schema sollte außerdem festlegen, wie mit fehlenden Informationen umzugehen ist. Ohne eindeutige Vorgaben kann ein Modell Felder auslassen, leere Zeichenfolgen verwenden oder unbelegte Werte ergänzen. Einheitliche unbekannte Werte und leere Sammlungen unterstützen sowohl die technische Weiterverarbeitung als auch die spätere Bewertung.
+
+Schema-geführte Prompts schränken den Ausgaberaum ein, erzwingen seine Einhaltung jedoch nicht zwangsläufig. Eine unabhängige Validierung muss deshalb feststellen, ob die erzeugten Daten dem erwarteten Modell entsprechen. Gegebenenfalls ist zusätzlich eine deterministische Normalisierung erforderlich, bevor Werte verglichen oder an nachgelagerte Systeme übergeben werden können.
+
+\subsubsection{Prompt Engineering für Extraktionsaufgaben}
+
+Prompt Engineering bezeichnet die systematische Gestaltung der Eingabe, mit der ein Sprachmodell zur Bearbeitung einer Aufgabe angeleitet wird. Für strukturierte Informationsextraktion umfasst der Prompt insbesondere den Extraktionsauftrag, das Zielmodell, attributbezogene Regeln, Beispiele sowie Vorgaben für fehlende oder mehrdeutige Informationen.
+
+Die Aufgabenbeschreibung sollte festlegen, dass Informationen aus der bereitgestellten Quelle extrahiert und nicht aus allgemeinem Wissen ergänzt werden sollen. Ebenso sind das erwartete Ausgabeformat und der Ausschluss zusätzlicher Erläuterungen zu definieren. Eine klare Trennung zwischen Instruktionen und Produktdaten verringert den Interpretationsspielraum des Modells.
+
+Das Ziel- und Ausgabeschema konkretisiert die erwartete Struktur durch Feldnamen, Datentypen, Listen, Verschachtelungen und zulässige Werte. Vijayan zeigt anhand eines anwendungsbezogenen Ansatzes, wie Aufgabenbeschreibung und Ausgabeformat für eine strukturierte Extraktion kombiniert werden können \cite{vijayan2023prompt}. Die konkrete Wirkung bleibt dabei vom betrachteten Anwendungsfall abhängig.
+
+Die notwendige Prompttiefe unterscheidet sich zwischen Attributen. Direkt gekennzeichnete Werte können häufig durch kompakte Regeln beschrieben werden. Semantisch mehrdeutige Attribute benötigen zusätzliche Abgrenzungen, während verschachtelte oder kontextabhängige Strukturen mehrere fachliche Teilentscheidungen erfordern. Diese Einteilung dient der aufgabenspezifischen Promptgestaltung und stellt keine allgemeine Taxonomie von LLM-Aufgaben dar.
+
+Positive Beispiele zeigen eine zulässige Zuordnung und die erwartete Ausgabe. Negative Beispiele beziehungsweise Gegenregeln verdeutlichen, welche ähnlich erscheinenden Informationen nicht übernommen werden sollen. Für mehrdeutige Attribute sind sie besonders relevant, da sie die Grenzen zwischen formal ähnlichen Sachverhalten konkretisieren. Die Auswahl der Beispiele darf jedoch nicht zu eng auf einzelne bekannte Eingaben ausgerichtet sein. Brunschwiler et al. zeigen, dass Few-Shot-Beispiele je nach Extraktionskategorie unterschiedliche und teilweise nachteilige Effekte besitzen können \cite{brunschwiler2025enhancing}.
+
+Ergänzend sind Evidenz- und Unsicherheitsregeln erforderlich. Das Modell sollte nur hinreichend belegte Werte ausgeben und fehlende oder nicht eindeutig zuordenbare Informationen in der vorgesehenen unbekannten Form repräsentieren. Besonders bei booleschen Attributen ist zwischen einer ausdrücklich negativen Aussage und dem Fehlen einer Aussage zu unterscheiden.
+
+Auch die Priorisierung von Informationsbereichen kann im Prompt beschrieben werden. Produktnahe Überschriften, gekennzeichnete Attributbereiche und fachliche Tabellen können gegenüber allgemeinen Shop- oder Navigationselementen bevorzugt werden. Eine solche Anweisung unterstützt die Auswahl zwischen konkurrierenden Angaben, bildet jedoch keine technische Garantie.
+
+Komplexe Attribute können durch geordnete Prüfschritte strukturiert werden. Hierzu gehören beispielsweise die Identifikation möglicher Kandidaten, der Ausschluss konkurrierender Bedeutungen und die Überführung des verbleibenden Wertes in das Zielmodell. Eine solche Schrittfolge innerhalb eines einzelnen Modellaufrufs ist von einer technisch getrennten Promptkette zu unterscheiden. Ebenso handelt es sich nicht um ein Tree-of-Thought-Verfahren, bei dem mehrere alternative Lösungswege erzeugt und bewertet werden.
+
+Eine abschließende Prüfanweisung kann das Modell auffordern, vor der Ausgabe Felder, Einheiten und Struktur zu kontrollieren. Sie ersetzt jedoch keine unabhängige Validierung. Da Änderungen an Regeln oder Beispielen die Ergebnisse beeinflussen können, muss die verwendete Promptfassung als Bestandteil der Versuchsbedingungen eindeutig dokumentiert werden.
+
+\subsubsection{Zuverlässigkeit und Grenzen LLM-basierter Extraktion}
+
+LLM-basierte Extraktion kann auf fachlicher, struktureller und repräsentationsbezogener Ebene fehlschlagen. Fachliche Fehler umfassen insbesondere Auslassungen, Überextraktion und semantische Fehlzuordnungen. Eine vorhandene Information kann übersehen, eine unbelegte Angabe ergänzt oder ein korrekt erkannter Wert dem falschen Attribut zugeordnet werden.
+
+Strukturelle Fehler betreffen die technische Ausgabe. Dazu gehören ungültiges JSON, unerwartete Felder, falsche Datentypen, unzulässige Werte und fehlerhafte Verschachtelungen. Repräsentationsfehler entstehen, wenn fachlich vergleichbare Werte in unterschiedlichen Zahlenformaten oder Einheiten ausgegeben werden. Solche Abweichungen können teilweise normalisiert werden, solange keine semantisch unterschiedlichen Dimensionen gleichgesetzt werden.
+
+Jansen et al. zeigen anhand umfangreicher Extraktionsdaten, dass die Genauigkeit stärker zwischen einzelnen Variablen als zwischen den untersuchten Modellen variieren kann \cite{data_extraction_ai}. Ausführlichere Variablenbeschreibungen standen mit einer höheren Genauigkeit in Zusammenhang, während nicht für alle Variablen eine ausreichende Qualität erreicht wurde. Die Ergebnisse stammen aus einer anderen Domäne, stützen jedoch die Notwendigkeit einer attributspezifischen Bewertung.
+
+Auch Prompttechniken besitzen keine universelle Wirkung. Beispiele und ausführlichere Regeln können die Aufgabe präzisieren, zugleich aber neue Abhängigkeiten von den gewählten Formulierungen erzeugen \cite{brunschwiler2025enhancing}. Eine Promptstrategie ist daher nicht bereits aufgrund ihrer Bestandteile geeignet, sondern muss unter dokumentierten Bedingungen empirisch untersucht werden.
+
+Aus diesen Grenzen folgt eine mehrstufige Bewertung. Zunächst ist zu prüfen, ob die Antwort syntaktisch verarbeitet und gegen das Zielmodell validiert werden kann. Davon getrennt sind Korrektheit, Vollständigkeit und Relevanz der extrahierten Informationen zu beurteilen. Laufzeit, Tokenverbrauch und Kosten ergänzen diese Qualitätsmerkmale um technische und wirtschaftliche Aspekte. Die hierfür erforderlichen Vergleichsgrundlagen und Metriken werden im folgenden Abschnitt betrachtet.
