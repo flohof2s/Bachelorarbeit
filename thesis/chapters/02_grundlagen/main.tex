@@ -72,8 +72,6 @@ Ein etabliertes Beispiel ist FASTUS. Das System organisiert die Informationsextr
 
 Das Kaskadenprinzip lässt sich auf feldspezifische Extraktionsaufgaben übertragen. Nach einer Vereinheitlichung der Eingabe können zunächst formale Kandidaten erkannt werden. Weitere Stufen bewerten deren Kontext, verwerfen unplausible Treffer, erzeugen fachliche Zielobjekte und lösen Konflikte zwischen mehreren Kandidaten.
 
-Der regelbasierte Referenzansatz dieser Arbeit ist von diesem Prinzip inspiriert. Er stellt jedoch keine vollständige Implementierung von FASTUS oder eines formal spezifizierten Finite-State-Transducers dar. Insbesondere erfolgen keine allgemeine syntaktische Analyse und keine Ereignisextraktion. Übernommen wird die stufenweise Verdichtung formaler Treffer zu einer domänenspezifischen Repräsentation für das Referenzfeld \emph{ProductSizing}.
-
 Regelbasierte Ansätze werden auch in der Lebensmitteldomäne eingesetzt. FoodIE kombiniert Vorverarbeitung, sprachliche Merkmale und Regeln zur Erkennung mehrteiliger Lebensmittelentitäten \cite{popovski2019foodie}. Akhtar et al. verbinden dagegen strukturelle und visuelle Merkmale zur Extraktion von Produktdaten aus E-Commerce-Webseiten \cite{akhtar2020efficient}. Beide Arbeiten verdeutlichen die Bandbreite regelbasierter Verfahren, unterscheiden sich jedoch hinsichtlich Datenquelle, Zielattributen und Verarbeitung von dem hier untersuchten Referenzansatz.
 
 \subsubsection{Herausforderungen lebensmittelbezogener Produkt- und Mengenangaben}
@@ -85,8 +83,6 @@ Bei Produktattributen ist ein formal passender Textwert nicht zwangsläufig dem 
 Mengenangaben bestehen typischerweise aus einem numerischen Wert, einer Einheit und gegebenenfalls einem Multiplikator oder Verpackungsbegriff. Auf derselben Produktseite können Verpackungsgröße, Nährwertreferenz, Portionsmenge, Grundpreisbezug und Versandgewicht vorkommen. Bei Mehrfachpackungen sind außerdem Anzahl, Einzelgröße und Gesamtinhalt voneinander zu unterscheiden.
 
 Gewicht, Volumen und Stückzahl bilden unterschiedliche Einheitendimensionen. Werte derselben Dimension können für einen Vergleich normalisiert werden, während eine Umrechnung zwischen unterschiedlichen Dimensionen zusätzliche fachliche Annahmen erfordern würde. Arici et al. zeigen für die Extraktion von Produktmengen zur Grundpreisberechnung, dass relevante Angaben über mehrere Produktfelder verteilt sein können und sowohl die passende Dimension als auch die zum Produkt gehörende Menge bestimmt werden müssen \cite{arici2021priceperunit}.
-
-Das Referenzfeld \emph{ProductSizing} besitzt damit eine begrenzte Zielstruktur, erfordert jedoch mehr als die Erkennung einer Zahl-Einheit-Kombination. Notwendig sind Kontextbewertung, Ausschluss konkurrierender Mengenarten, Behandlung von Mehrfachpackungen, Normalisierung und Konfliktlösung. Die konkrete Definition des Referenzwertes und der unterstützten Einheiten ist eine projektspezifische Festlegung und wird in den nachfolgenden Kapiteln beschrieben.
 
 \subsection{LLM-basierte strukturierte Informationsextraktion}
 
@@ -149,3 +145,128 @@ Jansen et al. zeigen anhand umfangreicher Extraktionsdaten, dass die Genauigkeit
 Auch Prompttechniken besitzen keine universelle Wirkung. Beispiele und ausführlichere Regeln können die Aufgabe präzisieren, zugleich aber neue Abhängigkeiten von den gewählten Formulierungen erzeugen \cite{brunschwiler2025enhancing}. Eine Promptstrategie ist daher nicht bereits aufgrund ihrer Bestandteile geeignet, sondern muss unter dokumentierten Bedingungen empirisch untersucht werden.
 
 Aus diesen Grenzen folgt eine mehrstufige Bewertung. Zunächst ist zu prüfen, ob die Antwort syntaktisch verarbeitet und gegen das Zielmodell validiert werden kann. Davon getrennt sind Korrektheit, Vollständigkeit und Relevanz der extrahierten Informationen zu beurteilen. Laufzeit, Tokenverbrauch und Kosten ergänzen diese Qualitätsmerkmale um technische und wirtschaftliche Aspekte. Die hierfür erforderlichen Vergleichsgrundlagen und Metriken werden im folgenden Abschnitt betrachtet.
+
+\subsection{Evaluation strukturierter Extraktionsverfahren}
+
+Die Evaluation strukturierter Extraktionsverfahren muss mehrere Qualitäts- und Prozessebenen unterscheiden. Neben der fachlichen Korrektheit und Vollständigkeit der extrahierten Informationen sind die formale Übereinstimmung mit der erwarteten Struktur sowie die technische und wirtschaftliche Effizienz der Verarbeitung zu berücksichtigen. Da Datenqualität mehrdimensional ist, kann die Leistungsfähigkeit eines Extraktionsverfahrens nicht durch eine einzelne Kennzahl vollständig beschrieben werden \cite{wang1996beyond,batini2016data}. Erforderlich sind daher eine verlässliche Referenzbasis, eindeutig definierte Vergleichsregeln und eine Kombination komplementärer Metriken.
+
+\subsubsection{Ground Truth und Vergleichsgrundlagen}
+
+Bei einer referenzbasierten Evaluation werden die erzeugten Extraktionsergebnisse mit zuvor festgelegten Sollwerten verglichen. Diese Referenzdaten werden als \emph{Ground Truth} bezeichnet und repräsentieren den für die Untersuchung als fachlich korrekt angenommenen Zustand. Bei unstrukturierten oder schwach strukturierten Quellen wird die Ground Truth häufig durch eine manuelle Prüfung und Annotation der Ausgangsdaten erzeugt. Jansen et al. verwenden beispielsweise menschlich extrahierte Daten aus systematischen Übersichten als Referenz für die Bewertung generativer Extraktionsverfahren \cite{data_extraction_ai}.
+
+Die Aussagekraft der Evaluation hängt unmittelbar von der Qualität und Eindeutigkeit dieser Referenzdaten ab. Vor der Annotation muss deshalb festgelegt werden, welche Informationen zu erfassen sind, welche Quellenbereiche als Evidenz gelten und wie fehlende oder mehrdeutige Angaben behandelt werden. Die Annotationsregeln sollten für alle Datensätze einheitlich angewendet und so dokumentiert werden, dass die Zuordnung eines Referenzwertes nachvollzogen werden kann.
+
+Dabei ist zwischen verschiedenen Arten fehlender Referenzwerte zu unterscheiden. Das bestätigte Fehlen einer gesuchten Information kann einen gültigen negativen Referenzfall darstellen. Davon abzugrenzen sind Datensätze, bei denen die Information aufgrund uneindeutiger, unvollständiger oder nicht beurteilbarer Quellen nicht zuverlässig bestimmt werden kann. Solche unsicheren Fälle sollten nicht stillschweigend als negative Beispiele oder als Extraktionsfehler behandelt, sondern gekennzeichnet und abhängig von der jeweiligen Metrik ausgeschlossen werden. Die Größe der tatsächlich auswertbaren Grundgesamtheit ist entsprechend separat auszuweisen.
+
+Für einen aussagekräftigen Vergleich müssen Referenz und Vorhersage auf derselben fachlichen und strukturellen Ebene gegenübergestellt werden. Unterschiedliche Schreibweisen, Dezimaldarstellungen oder kompatible Einheiten können denselben Sachverhalt repräsentieren. Vor einem quantitativen Vergleich kann deshalb eine deterministische Normalisierung erforderlich sein. Sie darf ausschließlich äquivalente Darstellungen vereinheitlichen und keine fehlenden Informationen ergänzen oder semantische Mehrdeutigkeiten auflösen.
+
+Neben den normalisierten Vergleichswerten sollten die ursprünglichen Darstellungen erhalten bleiben. Der normalisierte Wert ermöglicht eine konsistente Berechnung der Kennzahlen, während der Originalwert für die qualitative Fehleranalyse benötigt wird. Dadurch kann unterschieden werden, ob eine Abweichung aus einer fachlich falschen Extraktion oder lediglich aus einer unterschiedlichen Repräsentation resultiert.
+
+Werden mehrere Verfahren miteinander verglichen, müssen für sie identische Bewertungsbedingungen gelten. Dazu gehören dieselbe Datenauswahl, dieselben Attributdefinitionen, dieselben Referenzwerte sowie einheitliche Normalisierungs- und Vergleichsregeln. Unterschiede im fachlichen Umfang der Verfahren müssen bei der Interpretation berücksichtigt werden. Ein direkter Vergleich ist nur für diejenigen Informationen zulässig, die von allen betrachteten Verfahren unter vergleichbaren Bedingungen erzeugt werden.
+
+\subsubsection{Metriken der Extraktionsqualität}
+
+Die fachliche Extraktionsqualität kann anhand einer Konfusionsmatrix operationalisiert werden. Voraussetzung ist eine eindeutige Definition der betrachteten Bewertungseinheit, beispielsweise eines Attributwertes oder einer extrahierten Entität. Auf dieser Grundlage werden vier Fälle unterschieden:
+
+\begin{itemize}
+    \item Ein \emph{True Positive} (TP) liegt vor, wenn eine erwartete Information korrekt extrahiert wurde.
+    \item Ein \emph{False Positive} (FP) bezeichnet eine ausgegebene Information, die nicht mit der Referenz übereinstimmt oder nicht belegt ist.
+    \item Ein \emph{False Negative} (FN) liegt vor, wenn eine in der Referenz vorhandene Information nicht korrekt extrahiert wurde.
+    \item Ein \emph{True Negative} (TN) bezeichnet einen bestätigten negativen Referenzfall, für den das Verfahren ebenfalls keine positive Vorhersage erzeugt.
+\end{itemize}
+
+Bei einer falschen positiven Vorhersage ist vorab festzulegen, ob sie sowohl als nicht erkannter korrekter Referenzwert als auch als zusätzliche falsche Ausgabe gezählt wird. Je nach Evaluationsmodell kann derselbe Fall damit einen False Negative und einen False Positive verursachen. Die gewählte Zählweise muss für alle Verfahren einheitlich sein und bei der Interpretation der Kennzahlen berücksichtigt werden.
+
+Die \emph{Precision} beschreibt den Anteil korrekter Extraktionen an allen positiven Vorhersagen:
+
+\[
+\mathrm{Precision} = \frac{TP}{TP + FP}
+\]
+
+Eine hohe Precision bedeutet, dass ausgegebene Werte mit hoher Wahrscheinlichkeit der Referenz entsprechen. Die Kennzahl reagiert insbesondere auf Überextraktion und unbelegte Vorhersagen.
+
+Der \emph{Recall} misst den Anteil korrekt erkannter Informationen an allen in der Referenz vorhandenen positiven Fällen:
+
+\[
+\mathrm{Recall} = \frac{TP}{TP + FN}
+\]
+
+Ein niedriger Recall weist darauf hin, dass relevante Informationen ausgelassen oder nicht korrekt erkannt werden.
+
+Der \emph{F1-Score} bildet das harmonische Mittel aus Precision und Recall:
+
+\[
+F_1 = 2 \cdot
+\frac{\mathrm{Precision} \cdot \mathrm{Recall}}
+{\mathrm{Precision} + \mathrm{Recall}}
+\]
+
+Er unterstützt eine zusammenfassende Betrachtung beider Fehlerarten, sollte die getrennte Angabe von Precision und Recall jedoch nicht ersetzen. Vergleichbare Kennzahlen werden auch zur Bewertung generativer Datenextraktion eingesetzt \cite{data_extraction_ai}.
+
+Ergänzend kann eine \emph{Exact Match Rate} den Anteil der Fälle erfassen, in denen Vorhersage und Referenz nach Anwendung der festgelegten Normalisierungsregeln vollständig übereinstimmen. Sie stellt ein strenges Kriterium dar, berücksichtigt jedoch nicht den Grad einer Abweichung. Bei zusammengesetzten Attributen kann bereits ein einzelner fehlerhafter Bestandteil dazu führen, dass das gesamte Ergebnis als nicht übereinstimmend bewertet wird.
+
+Weitere Kennzahlen können gezielt bestimmte Fehleraspekte abbilden. Die \emph{Prediction Coverage} beschreibt den Anteil der auswertbaren Datensätze, für die eine Vorhersage erzeugt wurde. Eine \emph{Missing Rate} erfasst fehlende Extraktionen bei vorhandenen Referenzwerten, während eine \emph{Over-Extraction Rate} unbelegte Vorhersagen in negativen Referenzfällen betrachtet. Bei zusammengesetzten Werten können außerdem Teilmetriken für einzelne Bestandteile oder semantische Dimensionen berechnet werden.
+
+Die Aussage jeder Kennzahl hängt von ihrer Grundgesamtheit ab. Teilmetriken, die nur für vorhandene oder teilweise korrekte Vorhersagen berechnet werden, dürfen nicht als Gesamtgenauigkeit des Verfahrens interpretiert werden. Ebenso kann eine allgemeine Accuracy,
+
+\[
+\mathrm{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN},
+\]
+
+bei einer ungleichen Verteilung positiver und negativer Fälle irreführend sein. Besteht die Mehrheit des Datensatzes aus negativen Fällen, kann ein Verfahren durch häufige negative Vorhersagen eine hohe Accuracy erreichen, obwohl es vorhandene Informationen nur unzureichend extrahiert. Accuracy sollte deshalb nur gemeinsam mit der Klassenverteilung sowie Precision und Recall berichtet werden.
+
+\subsubsection{Technische Verarbeitbarkeit und Effizienz}
+
+Die fachliche Extraktionsqualität ist von der technischen Verarbeitbarkeit der Ergebnisse zu unterscheiden. Ein inhaltlich plausibler Wert kann unbrauchbar sein, wenn er nicht in einem maschinell lesbaren Format vorliegt. Umgekehrt kann eine formal korrekte und schema-konforme Ausgabe fachlich falsche oder unvollständige Informationen enthalten.
+
+Bei strukturierten Ausgaben können daher mehrere technische Erfolgsstufen betrachtet werden. Zunächst ist zu prüfen, ob die Antwort syntaktisch gelesen werden kann. Darauf folgt die Prüfung, ob Felder, Datentypen, Wertebereiche und Verschachtelungen dem vorgesehenen Schema entsprechen. Weitere Kennzahlen können den Erfolg einer notwendigen Normalisierung oder den vollständigen Abschluss sämtlicher verpflichtender Verarbeitungsschritte erfassen. Diese Raten beschreiben die technische Stabilität des Verfahrens, nicht die Korrektheit seiner Inhalte.
+
+Für eine vollständige Bewertung sind zusätzlich Effizienzaspekte relevant. Mögliche Messgrößen sind die Verarbeitungsdauer pro Datensatz, der Durchsatz, der Ressourcenverbrauch sowie die entstehenden Betriebskosten. Bei extern ausgeführten Sprachmodellen können zusätzlich Eingabe- und Ausgabetokens sowie die daraus resultierenden Kosten betrachtet werden. Regelbasierte und lernbasierte Verfahren unterscheiden sich dabei sowohl hinsichtlich ihrer Laufzeitstruktur als auch hinsichtlich der Art ihrer Aufwände. Neben dem Aufwand der eigentlichen Ausführung kann insbesondere bei regelbasierten Webextraktionsverfahren auch die Erstellung und Wartung der Extraktionsregeln relevant sein \cite{ferrara2014web}.
+
+Qualitäts- und Effizienzmetriken sollten getrennt berichtet und anschließend gemeinsam interpretiert werden. Eine kurze Laufzeit oder geringe Kosten sind nur dann vorteilhaft, wenn die erzielte Extraktionsqualität für den vorgesehenen Verwendungszweck ausreicht. Umgekehrt kann eine höhere fachliche Qualität mit zusätzlichen Laufzeiten und Kosten verbunden sein. Eine transparente Gegenüberstellung der Einzelkennzahlen ermöglicht eine differenziertere Beurteilung als ihre Zusammenfassung in einem einzelnen Kosten-Nutzen-Wert. Die konkrete Definition der Grundgesamtheiten, Ausschlussregeln und Berechnungsverfahren erfolgt im Rahmen des jeweiligen Evaluationsdesigns.
+
+\subsection{Verwandte Arbeiten und Forschungslücke}
+
+Die zuvor dargestellten Grundlagen werden im Folgenden anhand verwandter Arbeiten eingeordnet. Betrachtet werden zunächst LLM-basierte Ansätze zur strukturierten Daten- und Produktattributextraktion. Anschließend werden klassische, regelbasierte Verfahren gegenübergestellt. Die Synthese berücksichtigt insbesondere die Beschaffenheit der Eingabedaten, den Umfang der Zielstruktur, die eingesetzten Extraktionsverfahren und die Art ihrer Evaluation. Auf dieser Grundlage wird der durch die vorliegende Arbeit adressierte Forschungsbedarf abgeleitet.
+
+\subsubsection{LLM-basierte strukturierte Daten- und Produktattributextraktion}
+
+Jansen et al. untersuchen den Einsatz generativer künstlicher Intelligenz zur Extraktion einer großen Anzahl unterschiedlicher Variablen aus wissenschaftlichen Dokumenten \cite{data_extraction_ai}. Grundlage der Evaluation bilden bereits durch Menschen extrahierte Referenzdaten. Die Ergebnisse zeigen, dass die Extraktionsqualität wesentlich von der jeweils betrachteten Variable abhängt und ausführlichere Variablenbeschreibungen mit einer höheren Genauigkeit verbunden sein können. Die Arbeit liefert damit einen umfangreichen empirischen Nachweis für die Attributabhängigkeit LLM-basierter Extraktion. Ihr Untersuchungsgegenstand umfasst jedoch wissenschaftliche Dokumente und einzelne Variablen, nicht die Transformation vollständiger Webdokumente in ein Produktdatenschema.
+
+Mit SPIRES entwickeln Caufield et al. einen Ansatz zur schema-geführten Extraktion aus biomedizinischen Texten \cite{caufield2024spires}. Die zu extrahierenden Inhalte werden durch ein nutzerdefiniertes und teilweise verschachteltes Schema beschrieben. Die Modellausgaben werden anschließend mithilfe externer Vokabulare und Ontologien geprüft und vereinheitlicht. Die Arbeit verdeutlicht damit, dass LLM-basierte semantische Extraktion mit deterministischen Validierungs- und Normalisierungsschritten kombiniert werden kann. Der Schwerpunkt liegt jedoch auf der Befüllung biomedizinischer Wissensstrukturen und nicht auf heterogenen Webseiten oder E-Commerce-Daten.
+
+Vijayan untersucht die Gestaltung von Prompts für die strukturierte Extraktion aus unstrukturiertem Text \cite{vijayan2023prompt}. Brunschwiler et al. vergleichen Zero-Shot- und Few-Shot-Konfigurationen bei der Extraktion von Informationen für Simulationsmodelle \cite{brunschwiler2025enhancing}. Beide Arbeiten bestätigen die Bedeutung einer eindeutigen Aufgabenbeschreibung und strukturierten Ausgabevorgabe. Zugleich zeigen die Ergebnisse von Brunschwiler et al., dass zusätzliche Beispiele nicht für jede Attributkategorie dieselbe Wirkung besitzen. Die Promptgestaltung ist damit als anwendungs- und attributabhängiger Bestandteil des Extraktionsverfahrens zu behandeln.
+
+Unmittelbarer auf den E-Commerce-Bereich ausgerichtet ist der Ansatz von Fang et al. \cite{fang2024llmensemble}. Die Autoren kombinieren mehrere große Sprachmodelle, um Produktattributwerte zu extrahieren. Abhängig vom betrachteten Attribut werden die Ausgaben der Modelle unterschiedlich gewichtet und zu einem Ensemble-Ergebnis zusammengeführt. Die Untersuchung zeigt, dass sich Modelle bei der Extraktion verschiedener Attribute ergänzen können. Im Mittelpunkt stehen jedoch einzelne Produktattributwerte und die optimale Auswahl beziehungsweise Kombination mehrerer Modelle. Die Überführung eines vollständigen Webdokuments in ein umfangreiches verschachteltes Zielschema wird nicht betrachtet.
+
+Çiftlikçi et al. entwickeln ein domänenspezifisch angepasstes Sprachmodell für die Extraktion von Attributen und die Kategorisierung von Produkten auf einer E-Commerce-Plattform \cite{ciftlikci2025attribute}. Die Untersuchung verarbeitet Produktbeschreibungen und vergleicht den entwickelten Ansatz mit einem Deep-Learning-Modell. Damit adressiert sie sowohl die fachliche Attributextraktion als auch die technische Einbindung in eine umfangreiche E-Commerce-Umgebung. Der Ansatz basiert jedoch auf einer plattformspezifischen Modellanpassung und bereits textuell aufbereiteten Produktinformationen. Eine schema-geführte Extraktion aus vollständigen heterogenen HTML-Dokumenten steht nicht im Mittelpunkt.
+
+Die betrachteten LLM-Arbeiten belegen somit die grundsätzliche Eignung großer Sprachmodelle für strukturierte Extraktionsaufgaben. Sie behandeln unter anderem umfangreiche Variablenmengen, verschachtelte Schemata, Promptkonfigurationen, Produktattribute und domänenspezifische Modellanpassungen. Ihre Untersuchungsdesigns unterscheiden sich jedoch deutlich hinsichtlich der Eingabeform, der Zielrepräsentation und der nachgelagerten Validierung. Eine hohe Qualität in einem dieser Anwendungsbereiche lässt sich daher nicht unmittelbar auf die Transformation heterogener Web-Produktdaten übertragen.
+
+\subsubsection{Regelbasierte und klassische Extraktionsansätze}
+
+Regelbasierte Verfahren bilden einen etablierten Ausgangspunkt der Webdatenextraktion. Ferrara et al. ordnen in ihrer Übersicht unter anderem manuell definierte Wrapper, strukturorientierte Verfahren und lernbasierte Ansätze ein \cite{ferrara2014web}. Klassische Wrapper nutzen beispielsweise DOM-Strukturen, XPath-Ausdrücke oder wiederkehrende Muster, um relevante Inhalte innerhalb einer Webseite zu lokalisieren. Ihre Stärke liegt in der expliziten und nachvollziehbaren Beschreibung der Extraktionslogik. Gleichzeitig können Änderungen an Seitenstrukturen oder bislang nicht berücksichtigte Darstellungsvarianten eine Anpassung der Regeln erforderlich machen.
+
+Akhtar et al. kombinieren strukturelle, visuelle und textuelle Merkmale zur Extraktion von Produktdaten aus E-Commerce-Webseiten \cite{akhtar2020efficient}. Das Verfahren identifiziert relevante Bereiche anhand von DOM-Strukturen, Tagfolgen und wiederkehrenden Layoutmerkmalen. Dadurch kann die vorhandene Seitenstruktur gezielt für die Extraktion genutzt werden. Die Übertragbarkeit ist jedoch von der Stabilität der untersuchten Webseiten und der Eignung der ausgewählten Strukturmerkmale abhängig.
+
+Neben solchen quellstrukturbezogenen Verfahren existieren domänenspezifische regelbasierte Ansätze. FoodIE verwendet sprachliche Vorverarbeitung, semantische Kategorien und Regeln zur Erkennung von Lebensmittelentitäten in Rezept- und Ernährungstexten \cite{popovski2019foodie}. Das Verfahren benötigt keinen umfangreichen annotierten Trainingsdatensatz und ermöglicht eine nachvollziehbare Zusammensetzung mehrteiliger Entitäten. Sein Ziel ist jedoch die Named-Entity Recognition in natürlichsprachlichen Texten und nicht die vollständige Strukturierung von Produktdatensätzen.
+
+FASTUS bildet einen methodischen Vorläufer kaskadierter Informationsextraktion \cite{hobbs1997fastus}. Durch mehrere aufeinander aufbauende Verarbeitungsschritte werden zunächst lokale sprachliche Strukturen erkannt und anschließend zu domänenspezifischen Repräsentationen verdichtet. Das Verfahren zeigt, wie eine umfangreiche Extraktionsaufgabe in begrenzte regelbasierte Teilprobleme zerlegt werden kann. Die konkrete Ausgestaltung der Kaskade bleibt dabei an die jeweilige Domäne und die erwarteten Informationsstrukturen gebunden.
+
+Die klassischen Ansätze lassen sich damit grob in quellstrukturbezogene und domänenbezogene Verfahren unterscheiden. Quellstrukturbezogene Wrapper nutzen wiederkehrende Eigenschaften von Webseiten, während domänenbezogene Verfahren sprachliche Muster, Fachbegriffe und Kontextregeln für einen begrenzten Zielbereich modellieren. Beide Ausrichtungen ermöglichen explizite und grundsätzlich nachvollziehbare Entscheidungen. Ihre Leistungsfähigkeit außerhalb der berücksichtigten Quellen, Attribute und Schreibweisen muss jedoch gesondert untersucht werden.
+
+\subsubsection{Synthese und Forschungslücke}
+
+Die betrachtete Literatur adressiert wesentliche Teilaspekte der strukturierten Informationsextraktion. LLM-basierte Arbeiten untersuchen die Extraktion einzelner Variablen, die Befüllung verschachtelter Schemata, die Gestaltung von Prompts und die Erkennung von Produktattributen. Klassische Verfahren verwenden dagegen explizite Struktur-, Muster- und Kontextregeln, um Informationen aus Webseiten oder domänenspezifischen Texten zu gewinnen. Die Arbeiten unterscheiden sich jedoch hinsichtlich ihrer Eingabedaten, des Extraktionsumfangs und der verwendeten Evaluationsbedingungen.
+
+Ein erster Unterschied betrifft die Beschaffenheit der Eingaben. Mehrere LLM-basierte Produktstudien verarbeiten isolierte Produktbezeichnungen oder Beschreibungen. Vollständige Webseiten enthalten dagegen zusätzlich Navigationselemente, technische Strukturen, eingebettete Metadaten und konkurrierende Informationen. Klassische Web-Wrapper berücksichtigen diese Dokumentstrukturen, sind dabei jedoch häufig an bestimmte Layout- oder DOM-Merkmale gebunden. In der betrachteten Literatur wird die LLM-basierte schema-geführte Extraktion aus vollständigen heterogenen Webdokumenten nur begrenzt behandelt.
+
+Ein zweiter Unterschied besteht im Umfang der Zielstruktur. Produktattributstudien konzentrieren sich überwiegend auf ausgewählte Attributwerte oder Produktkategorien. SPIRES zeigt zwar die Extraktion in ein verschachteltes Schema, untersucht jedoch eine andere Domäne und eine andere Form der Eingabedaten. Damit bleibt offen, in welchem Maß ein LLM heterogene Informationen aus einem Webdokument in einem zusammenhängenden Extraktionsvorgang vollständig und strukturell konsistent auf ein umfangreiches Zielmodell abbilden kann.
+
+Darüber hinaus unterscheiden sich die betrachteten Evaluationsansätze. Häufig stehen fachliche Kennzahlen wie Precision, Recall, F1-Score oder attributbezogene Genauigkeit im Vordergrund. Für die Integration strukturierter Modellausgaben sind jedoch zusätzlich die syntaktische Verarbeitbarkeit, die Schema-Konformität und die Normalisierbarkeit relevant. Diese technischen Ebenen sind von der fachlichen Korrektheit und Vollständigkeit der Inhalte zu unterscheiden. Nicht alle betrachteten Arbeiten erfassen diese Qualitätsstufen getrennt.
+
+Ein weiterer Forschungsbedarf ergibt sich aus dem Vergleich unterschiedlicher Verfahrensklassen. LLM-basierte Produktstudien vergleichen häufig mehrere Sprachmodelle oder stellen sie trainierten lernbasierten Verfahren gegenüber. Regelbasierte Studien untersuchen dagegen überwiegend eigenständige Wrapper oder domänenspezifische Extraktionssysteme. In der ausgewerteten Literatur wurde kein Untersuchungsdesign identifiziert, das einen LLM-basierten schema-geführten Extraktionsansatz und ein regelbasiertes Verfahren unter einer gemeinsamen Referenzdefinition, identischen Eingabedaten und denselben Normalisierungs- und Vergleichsregeln quantitativ gegenüberstellt. Diese Aussage ist auf die im Rahmen der Arbeit betrachtete Literatur begrenzt und erhebt keinen Anspruch auf eine vollständige Erfassung sämtlicher existierender Untersuchungen.
+
+Schließlich werden technische und wirtschaftliche Aspekte nicht durchgängig gemeinsam mit der fachlichen Extraktionsqualität betrachtet. Die Laufzeit, der Ressourcenverbrauch und die Kosten eines Verfahrens beeinflussen dessen praktische Einsetzbarkeit, ermöglichen für sich genommen jedoch keine Aussage über die Qualität der erzeugten Daten. Eine belastbare Bewertung muss deshalb fachliche Qualität, technische Verarbeitbarkeit und Effizienz getrennt erfassen und anschließend gemeinsam interpretieren.
+
+Aus dieser Synthese ergibt sich der Bedarf an einer Untersuchung, die heterogene Web-Produktdaten in eine vorgegebene, typisierte und verschachtelte Struktur überführt, die erzeugten Ergebnisse auf technischer und fachlicher Ebene getrennt bewertet und für einen gemeinsamen Teilbereich einen kontrollierten Vergleich zwischen einem LLM-basierten und einem regelbasierten Verfahren ermöglicht. Ergänzend sind Laufzeit, Ressourcenverbrauch und Kosten zu erfassen. Die vorliegende Arbeit adressiert diese Kombination aus schema-geführter Transformation, mehrstufiger Qualitätsbewertung und vergleichender Evaluation.
