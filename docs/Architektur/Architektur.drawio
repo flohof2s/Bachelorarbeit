@@ -1,6 +1,6 @@
 <mxfile host="Electron" pages="12">
   <diagram name="Bausteinsicht" id="Oiy0dZnbijHB8Yicklsa">
-    <mxGraphModel dx="1437" dy="915" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+    <mxGraphModel dx="1472" dy="887" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -139,7 +139,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="q7DKXOS6JCL8-1hDmoBX-119" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="" vertex="1">
-          <mxGeometry height="40" width="40" x="1450" y="440" as="geometry" />
+          <mxGeometry height="40" width="40" x="1500" y="440" as="geometry" />
         </mxCell>
         <mxCell id="q7DKXOS6JCL8-1hDmoBX-122" parent="1" style="shape=module;align=left;spacingLeft=20;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=22;fontStyle=1" value="Bewertungs-export" vertex="1">
           <mxGeometry height="50" width="160" x="1570" y="435" as="geometry" />

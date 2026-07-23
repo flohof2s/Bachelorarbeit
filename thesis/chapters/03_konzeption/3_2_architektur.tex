@@ -487,7 +487,9 @@ Zielsystem ausgetauscht werden.
 
 \subsubsection{Schnittstellen- und Integrationskonzept}
 
-Die Systemgrenzen des CrawlDataTransformer werden durch fachlich definierte Ports gekapselt. Technische Adapter übersetzen externe Eingabe-, Speicher- und Ausgabeformate in die internen Modelle beziehungsweise aus diesen heraus. Dadurch bleibt die Transformationslogik von konkreten Übertragungsprotokollen, Datenbankstrukturen und anbieterspezifischen Schnittstellen getrennt. Tabelle~\ref{tab:interface-overview} fasst die wesentlichen Integrationen zusammen.
+Die Systemgrenzen des CrawlDataTransformer werden durch fachlich definierte Ports gekapselt. Technische Adapter übersetzen externe Eingabe-, Speicher- und Ausgabeformate in die 
+internen Modelle beziehungsweise aus diesen heraus. Dadurch bleibt die Transformationslogik von konkreten Übertragungsprotokollen, Datenbankstrukturen und anbieterspezifischen 
+Schnittstellen getrennt. Tabelle~\ref{tab:interface-overview} fasst die wesentlichen Integrationen zusammen.
 
 \begin{table}[H]
     \centering
@@ -581,10 +583,19 @@ die wissenschaftliche Auswertung bereit.
 
 \subsubsection{Status- und Fehlerbehandlungskonzept}
 
-Die Fehlerbehandlung unterscheidet zwischen requestlokalen und batchweiten Fehlern. Datenbezogene Probleme wie nicht parsebare LLM-Antworten, Schemaabweichungen, fehlende Zwischenergebnisse oder abgelehnte Exporte betreffen zunächst nur den jeweiligen \textit{TransformationRequest}. Technische Fehler können innerhalb eines Verarbeitungsschritts, bei der Persistenz oder bei der Kommunikation mit externen Diensten auftreten. Sie werden möglichst nahe an der verursachenden Verarbeitungsstufe erfasst.
+Die Fehlerbehandlung unterscheidet zwischen requestlokalen und batchweiten Fehlern. Datenbezogene Probleme wie nicht parsebare LLM-Antworten, Schemaabweichungen, fehlende 
+Zwischenergebnisse oder abgelehnte Exporte betreffen zunächst nur den jeweiligen \textit{TransformationRequest}. Technische Fehler können innerhalb eines Verarbeitungsschritts, 
+bei der Persistenz oder bei der Kommunikation mit externen Diensten auftreten. Sie werden möglichst nahe an der verursachenden Verarbeitungsstufe erfasst.
 
-Jeder Filter verarbeitet nur Anfragen in einem dafür vorgesehenen Eingangszustand. Erwartete Abweichungen werden soweit möglich in den jeweiligen Ergebnisobjekten dokumentiert, beispielsweise durch Validierungsfehler mit dem betroffenen Datenpfad oder Verarbeitungsfehler mit Fehlercode und Beschreibung. Kann eine Anfrage nicht sinnvoll fortgesetzt werden, wechselt sie in den terminalen Zustand \textit{FAILED}. Die übrigen Anfragen desselben Batches können weiterhin verarbeitet werden.
+Jeder Filter verarbeitet nur Anfragen in einem dafür vorgesehenen Eingangszustand. Erwartete Abweichungen werden soweit möglich in den jeweiligen Ergebnisobjekten dokumentiert, 
+beispielsweise durch Validierungsfehler mit dem betroffenen Datenpfad oder Verarbeitungsfehler mit Fehlercode und Beschreibung. Kann eine Anfrage nicht sinnvoll fortgesetzt 
+werden, wechselt sie in den terminalen Zustand \textit{FAILED}. Die übrigen Anfragen desselben Batches können weiterhin verarbeitet werden.
 
-Unerwartete Ausnahmen werden durch die Pipelineausführung abgefangen und mit dem betroffenen Filter, seiner Ausführungsdauer und der Fehlermeldung im Pipelinekontext gespeichert. Der technische Ausführungsstatus eines Filters ist dabei vom fachlichen Ergebnis zu unterscheiden: Ein Filter kann ohne Ausnahme ausgeführt werden und dennoch einen fachlichen Fehler feststellen. Eine allgemeine automatische Wiederholung fehlgeschlagener Schritte ist im Prototyp nicht vorgesehen.
+Unerwartete Ausnahmen werden durch die Pipelineausführung abgefangen und mit dem betroffenen Filter, seiner Ausführungsdauer und der Fehlermeldung im Pipelinekontext 
+gespeichert. Der technische Ausführungsstatus eines Filters ist dabei vom fachlichen Ergebnis zu unterscheiden: Ein Filter kann ohne Ausnahme ausgeführt werden und dennoch 
+einen fachlichen Fehler feststellen. Eine allgemeine automatische Wiederholung fehlgeschlagener Schritte ist im Prototyp nicht vorgesehen.
 
-Der Batchstatus wird aus den Zuständen der noch verarbeitbaren Anfragen abgeleitet. Einzelne fehlgeschlagene Requests werden über ihre Zustände und den \textit{failed\_count} sichtbar, führen jedoch nicht zum Abbruch des Batches. Der Batchstatus \textit{FAILED} wird nur gesetzt, wenn keine sinnvolle Fortsetzung möglich ist, etwa weil alle Anfragen fehlgeschlagen sind oder ein endgültiger Fehler des externen LLM-Batches sämtliche offenen Anfragen betrifft. Ein Batch mit erfolgreich exportierten und fehlgeschlagenen Anfragen endet dagegen als \textit{FINISHED}.
+Der Batchstatus wird aus den Zuständen der noch verarbeitbaren Anfragen abgeleitet. Einzelne fehlgeschlagene Requests werden über ihre Zustände und den \textit{failed\_count} 
+sichtbar, führen jedoch nicht zum Abbruch des Batches. Der Batchstatus \textit{FAILED} wird nur gesetzt, wenn keine sinnvolle Fortsetzung möglich ist, etwa weil alle Anfragen 
+fehlgeschlagen sind oder ein endgültiger Fehler des externen LLM-Batches sämtliche offenen Anfragen betrifft. Ein Batch mit erfolgreich exportierten und fehlgeschlagenen 
+Anfragen endet dagegen als \textit{FINISHED}.

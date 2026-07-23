@@ -1,11 +1,320 @@
-\subsection{Evaluationsmethodik}
+Dieses Kapitel untersucht den entwickelten Prototypen anhand eines manuell annotierten Testdatensatzes. Ziel ist es, die technische Verarbeitbarkeit des LLM-basierten Ansatzes, die fachliche Extraktionsqualität des Referenzdatenfelds \textit{ProductSizing} sowie die praktische Einsetzbarkeit des Verfahrens zu bewerten. Dabei ist zwischen der vollständigen LLM-basierten Produktextraktion und dem regelbasierten Referenzansatz zu unterscheiden. Während der LLM-basierte Ansatz ein umfassendes internes Produktextraktionsobjekt erzeugt, beschränkt sich der regelbasierte Ansatz auf die Extraktion der Verpackungsgröße und dient damit als feldspezifische Baseline.
 
-\subsubsection{Testdatensatz und Ground Truth}
+Die Evaluation erfolgt auf zwei Ebenen. Erstens wird untersucht, in welchem Umfang die durch das Sprachmodell erzeugten Ergebnisse technisch verarbeitbar sind. Hierzu werden insbesondere Parsebarkeit, Schema-Validierung, Normalisierung, Pipeline-Erfolg sowie Laufzeit-, Token- und Kostenkennzahlen betrachtet. Zweitens wird für das Referenzdatenfeld \textit{ProductSizing} ein fachlicher Vergleich zwischen dem LLM-basierten und dem regelbasierten Ansatz durchgeführt. Grundlage hierfür ist eine manuell erstellte Ground Truth, die ausschließlich auf der sichtbaren Produktseite beruht.
 
-\subsubsection{Festlegung der Key Performance Indicators (KPIs)}
+Abschnitt~6.1 beschreibt zunächst das Evaluationsdesign, den Testdatensatz, die Ground Truth sowie die Bewertungslogik. Abschnitt~6.2 betrachtet anschließend die technische Verarbeitbarkeit und Effizienz des LLM-basierten Ansatzes. Abschnitt~6.3 analysiert die fachliche Extraktionsqualität des Referenzdatenfelds \textit{ProductSizing} und stellt beide Ansätze vergleichend gegenüber. Abschließend werden die Ergebnisse in Abschnitt~6.4 eingeordnet und hinsichtlich ihrer Aussagekraft sowie ihrer Grenzen diskutiert.
 
-\subsection{Ergebnisanalyse und Vergleich}
+\subsection{Evaluationsdesign}
 
-\subsubsection{Analyse der Extraktionsgüte und Konformität}
+Das Evaluationsdesign legt die Datengrundlage, die Ein- und Ausschlusskriterien, die Versuchsbedingungen sowie die verwendeten Bewertungsmetriken fest. Dadurch wird sichergestellt, dass die später berichteten Ergebnisse nachvollziehbar interpretiert werden können. Da die Ground Truth ausschließlich das Referenzdatenfeld \textit{ProductSizing} abdeckt, ist die fachliche Evaluation auf dieses Feld begrenzt. Für die übrigen Teile des LLM-basierten Produktextraktionsobjekts kann im Rahmen dieser Untersuchung lediglich die technische Verarbeitbarkeit bewertet werden.
 
-\subsubsection{Gegenüberstellung: LLM vs. Regelbasiert}
+Für beide Ansätze gelten dieselben inhaltlichen Vergleichsbedingungen. Grundlage ist jeweils derselbe vorverarbeitete Produktkontext, der aus den gecrawlten HTML-Seiten erzeugt wurde. Die LLM-basierte Extraktion wurde für den gesamten Versuch mit einem einheitlichen Prompt durchgeführt. Der regelbasierte Ansatz verarbeitet dieselbe Eingabe deterministisch und erzeugt höchstens eine Verpackungsgröße. Die nachfolgenden Unterabschnitte beschreiben zunächst die Zusammensetzung des Testdatensatzes, anschließend die Erstellung der Ground Truth sowie die konkrete Bewertungslogik.
+
+\subsubsection{Stichprobenziehung und Zusammensetzung des Testdatensatzes}
+
+Die Evaluation basiert auf einer Stichprobe aus dem zum Zeitpunkt der Untersuchung vorhandenen Crawl-Datenbestand. Die Auswahl wurde mit dem Ground-Truth-Werkzeug zufällig und 
+ohne Zurücklegen durchgeführt. Hierzu wurden die verfügbaren ZIP-Archive proportional zur Anzahl ihrer noch nicht verwendeten JSON-Datensätze gewichtet. Innerhalb des ausgewählten 
+Archivs wurde anschließend ein noch nicht verwendeter Datensatz zufällig gezogen. Auf diese Weise wurden insgesamt 1.257 Datensätze für die manuelle Annotation ausgewählt.
+
+Von diesen Datensätzen wurden 257 Fälle ausgeschlossen. Der Ausschluss erfolgte, wenn es sich entweder nicht um eine Produktseite oder zwar um eine Produktseite, jedoch nicht um 
+ein Lebensmittelprodukt handelte. Hierzu zählten beispielsweise Seiten zu Körperpflegeprodukten. Da die Arbeit die Extraktion von Lebensmittel-Produktdaten untersucht, wurden 
+diese Fälle als \texttt{skipped} klassifiziert und nicht durch die Transformationspipeline verarbeitet. Der finale Evaluationsdatensatz umfasst somit 1.000 Lebensmittelproduktseiten. 
+Abbildung~\ref{fig:evaluation-datensaetze} stellt die Auswahl und die anschließende Aufteilung für die Verarbeitung zusammenfassend dar.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.5\textwidth]{evaluation_datensaetze.png}
+    \caption{Auswahl und Aufteilung des Evaluationsdatensatzes}
+    \label{fig:evaluation-datensaetze}
+\end{figure}
+
+Von den 1.000 einbezogenen Lebensmittelproduktseiten enthielten 904 Datensätze eine auf der sichtbaren Produktseite erkennbare Verpackungsgröße. Dies entspricht einem Anteil von 90,4\,\%. Bei den übrigen 96 Datensätzen beziehungsweise 9,6\,\% war keine Verpackungsgröße erkennbar. Diese Fälle stellen keine fehlenden Annotationen dar, sondern bestätigte negative Referenzfälle. Die konkrete Definition und Erfassung der Ground Truth wird in Abschnitt~6.1.2 erläutert.
+
+Für die Versuchsdurchführung wurden die 1.000 Datensätze in 20 Batches mit jeweils 50 Datensätzen aufgeteilt. Sämtliche Batches wurden unter denselben Verarbeitungsbedingungen durch den CrawlDataTransformer ausgeführt. Die automatisch erzeugten Teilexporte wurden anschließend zu einer gemeinsamen Evaluation aggregiert.
+
+Die zufällige Auswahl bildet die Zusammensetzung des vorhandenen Crawl-Datenbestands ab, stellt jedoch keine nach Shops geschichtete oder ausgeglichene Stichprobe dar. Von den 1.000 Datensätzen stammen 985 und damit 98,5\,\% aus dem Rewe-Onlineshop. Die verbleibenden 15 Datensätze verteilen sich auf mehrere weitere Quellen. Der Testdatensatz weist daher einen deutlichen Quellenbias zugunsten von Rewe-Produktseiten auf, der bei der Interpretation und Übertragbarkeit der Ergebnisse zu berücksichtigen ist.
+
+\subsubsection{Annotation, Ground Truth und Ein- und Ausschlusskriterien}
+
+Die Ground Truth für das Referenzdatenfeld \textit{ProductSizing} wurde manuell durch einen einzelnen Annotator erstellt. Als fachliche Evidenz galten ausschließlich die auf der sichtbaren Produktseite dargestellten Informationen. Nicht sichtbare HTML-Metadaten, eingebettete strukturierte Daten oder weitere ausschließlich im Quelltext enthaltene Angaben wurden nicht zur Festlegung des Referenzwertes herangezogen. Das verwendete Annotationswerkzeug stellte automatisch erkannte Mengenkandidaten als Unterstützung bereit. Die Auswahl, Korrektur oder Ablehnung dieser Vorschläge sowie die abschließende Klassifikation erfolgten jedoch manuell.
+
+Für die Annotation wurden die in Tabelle~\ref{tab:ground-truth-status} dargestellten Kategorien unterschieden. Der Status \texttt{annotated} kennzeichnet einen positiven Referenzfall, bei dem auf der sichtbaren Lebensmittelproduktseite eine Verpackungsgröße erkennbar war. Der Status \texttt{not\_found} bezeichnet einen bestätigten negativen Referenzfall. Er wurde vergeben, wenn es sich um eine Lebensmittelproduktseite handelte, auf der jedoch keine Verpackungsgröße in einer berücksichtigten Masse- oder Volumeneinheit erkennbar war. Reine Stückangaben wie beispielsweise \enquote{10 Stück} wurden deshalb ebenfalls als \texttt{not\_found} klassifiziert. Nichtproduktseiten und Produktseiten außerhalb der Lebensmitteldomäne erhielten den Status \texttt{skipped} und wurden vor der Pipelineausführung aus dem Evaluationsdatensatz ausgeschlossen.
+
+\begin{table}[htbp]
+    \centering
+    \small
+    \begin{tabular}{p{0.18\textwidth} p{0.50\textwidth} p{0.22\textwidth}}
+        \hline
+        \textbf{Status} & \textbf{Bedeutung} & \textbf{Auswertung} \\
+        \hline
+        \texttt{annotated} &
+        Lebensmittelproduktseite mit sichtbar erkennbarer Verpackungsgröße &
+        positiver Referenzfall \\
+        \texttt{not\_found} &
+        Lebensmittelproduktseite ohne erkennbare Masse- oder Volumenangabe zur Verpackungsgröße &
+        negativer Referenzfall \\
+        \texttt{skipped} &
+        keine Produktseite oder kein Lebensmittelprodukt &
+        ausgeschlossen \\
+        \hline
+    \end{tabular}
+    \caption{Statuswerte der manuellen Ground-Truth-Annotation}
+    \label{tab:ground-truth-status}
+\end{table}
+
+Bei einem positiven Referenzfall wurden die sichtbare Originalangabe, der numerische Wert und die zugehörige Einheit erfasst. Zusätzlich wurden der Wert und die Einheit deterministisch normalisiert. Kilogramm wurden hierzu in Gramm und Liter in Milliliter überführt. Eine Umrechnung zwischen Masse und Volumen fand nicht statt. Durch die Normalisierung können äquivalente Darstellungen wie \enquote{0,5 kg} und \enquote{500 g} im quantitativen Vergleich als übereinstimmend bewertet werden, während die ursprüngliche Darstellung für die spätere Fehleranalyse erhalten bleibt.
+
+Bei Mehrfachpackungen wurde die Größe einer einzelnen enthaltenen Einheit als Referenzwert verwendet. Eine Angabe wie \enquote{6 x 250 ml} wurde somit mit einem normalisierten Referenzwert von \(250\,\mathrm{ml}\) annotiert. Waren auf einer Produktseite unterschiedliche Varianten dargestellt, war die zum Zeitpunkt der Annotation sichtbare beziehungsweise ausgewählte Variante maßgeblich. Im annotierten Datenbestand wurden jedoch keine systematisch relevanten Fälle mit einer auswählbaren Produktgröße festgestellt.
+
+Ergänzend zu den Statuswerten konnte eine Annotation als unsicher gekennzeichnet werden. Eine solche Kennzeichnung war sowohl für positive als auch für negative Referenzfälle möglich und hätte zum Ausschluss aus der fachlichen Auswertung geführt. Im für die Evaluation verwendeten Datenbestand war kein Datensatz als unsicher markiert. Da die Annotation ausschließlich durch eine Person und ohne unabhängige Zweitprüfung erfolgte, kann keine Inter-Annotator-Übereinstimmung ausgewiesen werden. Die daraus resultierende Einschränkung der Referenzqualität wird in Abschnitt~6.4.2 berücksichtigt.
+
+\subsubsection{Versuchsbedingungen, Vergleichslogik und Bewertungsmetriken}
+
+Sämtliche in die Evaluation einbezogenen Transformationsanfragen verfügten über eine manuell erstellte Ground Truth für das Referenzdatenfeld \textit{ProductSizing}. Die technische Bewertung der LLM-Verarbeitung und der fachliche Vergleich beider Extraktionsansätze beruhen damit auf derselben Ausgangsgrundgesamtheit. Technische Fehler können den tatsächlich auswertbaren Nenner einzelner nachgelagerter Kennzahlen dennoch reduzieren. Scheitert eine Transformationsanfrage beispielsweise an der Schema-Validierung, bleibt sie als technischer Fehler Bestandteil der Gesamtbewertung, kann jedoch nicht in den anschließenden Vergleich der normalisierten Verpackungsgrößen eingehen. Die für eine Kennzahl jeweils tatsächlich auswertbare Fallzahl wird deshalb gemeinsam mit den Ergebnissen ausgewiesen.
+
+Beide Extraktionsansätze verarbeiteten dasselbe persistierte Ergebnis der HTML-Vorverarbeitung. Unterschiede zwischen ihren Ergebnissen sind somit nicht auf abweichende Bereinigungs- oder Eingangsdaten zurückzuführen. Die LLM-basierte Extraktion erfolgte für alle Transformationsanfragen mit dem Modell \texttt{gemini-2.5-flash}, einem einheitlichen Prompt, einer Temperatur von 0,0 und deaktiviertem Thinking-Budget. Innerhalb des Evaluationslaufs wurden weder das Modell noch der Prompt oder die Generierungsparameter variiert. Die 1.000 Transformationsanfragen wurden in 20 Batches mit jeweils 50 Datensätzen verarbeitet. Jeder Datensatz wurde einmal durch die Pipeline geführt. Wiederholte Modellaufrufe zur Untersuchung möglicher Ausgabeschwankungen erfolgten nicht.
+
+Die technische Bewertung bezieht sich auf die vollständige LLM-basierte Produktextraktion. Sie unterscheidet mehrere aufeinanderfolgende Verarbeitungsstufen. Zunächst wird geprüft, ob die Modellantwort als JSON gelesen werden kann. Anschließend wird bewertet, ob das erzeugte Objekt dem internen Extraktionsschema entspricht und erfolgreich normalisiert werden kann. Die Pipeline-Erfolgsrate erfasst darüber hinaus den Anteil der Transformationsanfragen, die sämtliche für die Evaluation vorausgesetzten Verarbeitungsschritte erfolgreich abgeschlossen haben. Diese Kennzahlen beschreiben ausschließlich die technische Verarbeitbarkeit. Eine syntaktisch parsebare oder schema-konforme Ausgabe kann weiterhin fachlich falsche oder unvollständige Inhalte enthalten.
+
+Der fachliche Vergleich ist auf \textit{ProductSizing} begrenzt, da nur für dieses Datenfeld eine manuelle Ground Truth vorliegt und der regelbasierte Ansatz ausschließlich dieses Feld extrahiert. Die Bewertungseinheit ist eine normalisierte Verpackungsgröße pro Produktseite. Der regelbasierte Ansatz erzeugt höchstens ein Ergebnis. Enthält die LLM-Ausgabe mehrere Einträge in der Liste \texttt{product\_sizings}, berücksichtigt die implementierte Evaluation ausschließlich den ersten Eintrag. Ein an einer späteren Listenposition auftretender Referenzwert wird somit nicht als korrekte Extraktion gewertet.
+
+Eine Vorhersage gilt als vorhanden, wenn ein normalisierter numerischer Wert und eine normalisierte Einheit vorliegen. Referenz und Vorhersage werden nach der Vereinheitlichung auf Gramm beziehungsweise Milliliter verglichen. Eine vollständige Übereinstimmung liegt nur vor, wenn sowohl der normalisierte Wert als auch die normalisierte Einheit identisch sind. Die vier Fälle der Konfusionsmatrix werden für beide Verfahren einheitlich definiert:
+
+\begin{itemize}
+    \item Ein True Positive liegt vor, wenn eine positive Ground Truth vorhanden ist und Wert sowie Einheit der Vorhersage vollständig mit ihr übereinstimmen.
+    \item Ein False Positive liegt vor, wenn bei einer negativen Ground Truth eine Verpackungsgröße ausgegeben wird oder eine Vorhersage von einer positiven Ground Truth abweicht.
+    \item Ein False Negative liegt vor, wenn bei einer positiven Ground Truth keine Vorhersage erzeugt wird oder die ausgegebene Verpackungsgröße von der Referenz abweicht.
+    \item Ein True Negative liegt vor, wenn keine Verpackungsgröße in der Ground Truth enthalten ist und das Verfahren ebenfalls keine Verpackungsgröße ausgibt.
+\end{itemize}
+
+Eine abweichende Vorhersage bei positiver Ground Truth wird gleichzeitig als False Positive und False Negative gezählt. Damit wird sowohl das Fehlen des korrekten Referenzwertes als auch die Ausgabe eines falschen Wertes berücksichtigt. Diese Zählweise wird für den LLM-basierten und den regelbasierten Ansatz identisch angewendet.
+
+Die aus der Konfusionsmatrix abgeleiteten Hauptmetriken sind in Tabelle~\ref{tab:evaluationsmetriken} zusammengefasst. Ihre mathematischen Definitionen wurden bereits in Abschnitt~3.4.2 eingeführt und werden daher an dieser Stelle nicht erneut hergeleitet.
+
+\begin{table}[htbp]
+    \centering
+    \small
+    \begin{tabular}{p{0.22\textwidth} p{0.30\textwidth} p{0.38\textwidth}}
+        \hline
+        \textbf{Metrik} & \textbf{Bezugsmenge} & \textbf{Aussage} \\
+        \hline
+        Precision &
+        alle positiven Vorhersagen &
+        Anteil der ausgegebenen Verpackungsgrößen, die vollständig mit der Ground Truth übereinstimmen \\
+        Recall &
+        alle positiven Ground-Truth-Fälle &
+        Anteil der vorhandenen Verpackungsgrößen, die korrekt extrahiert werden \\
+        F1-Score &
+        Precision und Recall &
+        zusammenfassende Bewertung des Verhältnisses zwischen korrekten Vorhersagen und Auslassungen \\
+        Feldgenauigkeit &
+        alle fachlich auswertbaren Fälle &
+        Anteil der True Positives und True Negatives an den bewerteten Fällen \\
+        Over-Extraction Rate &
+        negative Ground-Truth-Fälle &
+        Anteil der Fälle ohne Referenzwert, für die dennoch eine Verpackungsgröße ausgegeben wird \\
+        \hline
+    \end{tabular}
+    \caption{Hauptmetriken der fachlichen Evaluation}
+    \label{tab:evaluationsmetriken}
+\end{table}
+
+Die Feldgenauigkeit wird nur gemeinsam mit der Klassenverteilung, Precision und Recall interpretiert. Aufgrund des hohen Anteils positiver Ground-Truth-Fälle kann eine aggregierte Genauigkeitskennzahl die unterschiedlichen Auswirkungen von Auslassungen und Überextraktionen nicht allein abbilden. Der F1-Score dient deshalb als zusammenfassende Kennzahl, ersetzt jedoch nicht die getrennte Betrachtung von Precision und Recall.
+
+Ergänzend erzeugt die Evaluation Teilmetriken für Wert, Einheit und Einheitendimension sowie eine Missing Rate, eine False Discovery Rate und eine normalisierte Exact-Match-Rate. Diese Kennzahlen werden nur diagnostisch eingesetzt. Ihre Bezugsmenge ist teilweise auf Fälle beschränkt, in denen sowohl eine Ground Truth als auch eine Vorhersage vorliegen. Sie dürfen daher nicht als Gesamtgenauigkeit des jeweiligen Ansatzes interpretiert werden. Zudem entspricht die Missing Rate rechnerisch dem Gegenstück des Recall und die False Discovery Rate dem Gegenstück der Precision. Die normalisierte Exact-Match-Rate ist aufgrund der Bewertung eines einzelnen Referenzwertes inhaltlich weitgehend redundant zum Recall.
+
+Neben den getrennten Metriken wird ein gepaarter Vergleich auf Request-Ebene durchgeführt. Dabei wird für jede Produktseite erfasst, ob beide Verfahren korrekt sind, nur eines der beiden Verfahren korrekt ist oder beide Verfahren eine fehlerhafte beziehungsweise keine Vorhersage erzeugen. Diese Ergebnismatrix berücksichtigt, dass beide Ansätze dieselben Eingabedaten und dieselbe Ground Truth verarbeiten. Sie ermöglicht dadurch eine unmittelbarere Gegenüberstellung als der ausschließliche Vergleich aggregierter Kennzahlen.
+
+Für die technische Effizienz des LLM-basierten Ansatzes werden zusätzlich Eingabe-, Ausgabe- und Thinking-Tokens, die daraus berechneten Modellkosten sowie die protokollierten lokalen Verarbeitungslaufzeiten ausgewertet. Die Laufzeitkennzahl bildet die innerhalb der Anwendung gemessenen Verarbeitungsschritte ab. Die Wartezeit zwischen der Einreichung eines externen LLM-Batches und der späteren Bereitstellung seiner Ergebnisse ist darin nicht vollständig enthalten. Die erfasste Laufzeit entspricht daher nicht einer durchgängigen Ende-zu-Ende-Wandzeit aus Sicht eines aufrufenden Nutzers.
+
+\subsection{Technische Verarbeitbarkeit und Effizienz des LLM-basierten Ansatzes}
+
+Die technische Bewertung untersucht, in welchem Umfang die vollständigen LLM-basierten Extraktionsergebnisse durch die nachgelagerte Verarbeitungskette genutzt werden konnten. Im Mittelpunkt stehen dabei die syntaktische Verarbeitung der Modellantworten, ihre Übereinstimmung mit dem internen Produktschema, die erfolgreiche Normalisierung sowie der Abschluss der verpflichtenden Pipelineabschnitte. Diese Betrachtung bezieht sich auf das gesamte \texttt{ProductExtraction}-Objekt und ist von der fachlichen Bewertung des Referenzdatenfelds \textit{ProductSizing} zu unterscheiden. Technische Verarbeitbarkeit bestätigt weder die Korrektheit noch die Vollständigkeit der extrahierten Produktinformationen.
+
+Abschnitt~6.2.1 berichtet zunächst die Ergebnisse der einzelnen technischen Verarbeitungsstufen und ordnet aufgetretene Fehler ihrem Entstehungspunkt zu. Abschnitt~6.2.2 betrachtet anschließend den für die LLM-basierte Extraktion erfassten Tokenverbrauch, die daraus resultierenden Modellkosten sowie die innerhalb der Anwendung gemessenen Laufzeiten.
+
+\subsubsection{Parsing, Schema-Validierung, Normalisierung und Pipeline-Erfolg}
+
+Die technische Verarbeitbarkeit des LLM-basierten Ansatzes wurde anhand der aufeinanderfolgenden Verarbeitungsstufen Parsing, Schema-Validierung, Normalisierung und Pipelineabschluss untersucht. Tabelle~\ref{tab:technische-verarbeitbarkeit} fasst die Ergebnisse zusammen. Die Erfolgsquoten beziehen sich jeweils auf die Anzahl der Transformationsanfragen, welche die betreffende Stufe erreicht haben. Ergänzend wird für die Normalisierung die kumulative Quote bezogen auf alle 1.000 Ausgangsanfragen betrachtet.
+
+\begin{table}[htbp]
+    \centering
+    \small
+    \begin{tabular}{p{0.34\textwidth} r r r}
+        \hline
+        \textbf{Verarbeitungsstufe} &
+        \textbf{Erfolgreich} &
+        \textbf{Bezugsmenge} &
+        \textbf{Quote} \\
+        \hline
+        LLM-Antwort vorhanden & 1.000 & 1.000 & 100,0\,\% \\
+        JSON-Parsing erfolgreich & 1.000 & 1.000 & 100,0\,\% \\
+        Schema-Validierung erfolgreich & 999 & 1.000 & 99,9\,\% \\
+        Normalisierung erfolgreich & 999 & 999 & 100,0\,\% \\
+        Pipeline erfolgreich abgeschlossen & 999 & 1.000 & 99,9\,\% \\
+        \hline
+    \end{tabular}
+    \caption{Ergebnisse der technischen Verarbeitung des LLM-basierten Ansatzes}
+    \label{tab:technische-verarbeitbarkeit}
+\end{table}
+
+Für sämtliche 1.000 Transformationsanfragen lag eine Antwort des Sprachmodells vor. Alle Antworten konnten durch den implementierten Parser in eine JSON-Datenstruktur überführt werden. Die Parsing-Erfolgsquote beträgt damit 100,0\,\%. Diese Kennzahl beschreibt die Verarbeitbarkeit durch die implementierte Antwortverarbeitung und ist nicht zwingend mit der unmittelbaren formalen Konformität der unveränderten Rohantwort gleichzusetzen. Der Parser versucht zunächst, die Antwort direkt als JSON einzulesen. Zusätzlich kann er vorhandene Markdown-Begrenzungen entfernen oder ein in zusätzlichem Text enthaltenes JSON-Objekt isolieren. Da der Evaluationsexport nicht getrennt ausweist, ob diese Wiederherstellungsmechanismen bei einzelnen Antworten erforderlich waren, kann aus der Erfolgsquote lediglich abgeleitet werden, dass alle Antworten durch die implementierte Verarbeitung syntaktisch erschlossen werden konnten.
+
+Von den 1.000 geparsten Antworten ließen sich 999 erfolgreich gegen das interne \texttt{ProductExtraction}-Schema validieren. Dies entspricht einer Schema-Validierungsrate von 99,9\,\%. Eine Antwort war zwar syntaktisch parsebar, enthielt jedoch Werte, die nicht den im Schema zugelassenen Ausprägungen entsprachen. Innerhalb dieser einzelnen Antwort wurden insgesamt 16 Validierungsfehler festgestellt. Sie betrafen unzulässige Enum-Werte in verschachtelten Einheitenfeldern von Zutatenobjekten. Die Anzahl der Validierungsfehler ist damit von der Anzahl schema-invalider Transformationsanfragen zu unterscheiden: Sämtliche 16 Einzelverletzungen traten innerhalb desselben Requests auf.
+
+Der Fehler führte dazu, dass für die betroffene Anfrage kein typisiertes \texttt{ProductExtraction}-Objekt erzeugt werden konnte. Sie wurde daher nicht an die nachfolgenden Verarbeitungsschritte übergeben. Das Ergebnis verdeutlicht die Trennung zwischen syntaktischer Parsebarkeit und struktureller Schema-Konformität. Obwohl sämtliche Modellantworten als JSON verarbeitet werden konnten, erfüllte eine davon nicht die Anforderungen des internen Datenmodells.
+
+Alle 999 schema-validen Extraktionsergebnisse wurden anschließend erfolgreich normalisiert. Bezogen auf die tatsächlich ausgeführten Normalisierungen beträgt die Erfolgsquote somit 100,0\,\%. Bezogen auf die ursprünglichen 1.000 Transformationsanfragen ergibt sich dagegen eine kumulative Quote von 99,9\,\%, da die schema-invalide Antwort die Normalisierungsstufe nicht erreichte. In der Normalisierung selbst trat kein weiterer technischer Fehler auf. Dieses Ergebnis bestätigt ausschließlich, dass die schema-validen Objekte in die vorgesehene vereinheitlichte Repräsentation überführt werden konnten. Eine Aussage über die fachliche Richtigkeit der enthaltenen Produktwerte ist damit nicht verbunden.
+
+Insgesamt schlossen 999 der 1.000 Transformationsanfragen die für den Evaluationslauf verpflichtenden Pipelineabschnitte erfolgreich ab. Die Pipeline-Erfolgsrate beträgt folglich 99,9\,\%. Der einzige fehlgeschlagene Request entspricht dem bereits beschriebenen Fall aus der Schema-Validierung. Nach erfolgreicher struktureller Validierung traten somit keine weiteren Fehler auf, welche die Normalisierung oder den anschließenden Pipelineabschluss verhinderten.
+
+Der technisch fehlgeschlagene Request verfügte ebenfalls über eine Ground Truth, erreichte aufgrund des vorzeitigen Abbruchs jedoch nicht den nachgelagerten Evaluationsfilter. Der fachliche Vergleich der normalisierten Verpackungsgrößen umfasst deshalb 999 statt 1.000 Transformationsanfragen. Die technische Fehlerquote bleibt davon unberührt und wird mit einem fehlgeschlagenen Fall in der Gesamtbewertung berücksichtigt.
+
+\subsubsection{Tokenverbrauch, Kosten und Laufzeit}
+
+Neben der technischen Verarbeitbarkeit wurden der Tokenverbrauch, die daraus resultierenden Modellkosten und die lokal protokollierte Verarbeitungsdauer ausgewertet. Die Token- und Kostenkennzahlen beziehen sich auf sämtliche 1.000 LLM-basierten Extraktionsanfragen. Tabelle~\ref{tab:llm-effizienz} fasst die gemessenen Werte zusammen. Die Kostenberechnung basiert auf den für den Evaluationslauf tatsächlich konfigurierten Preisen des verwendeten Modells.
+
+\begin{table}[htbp]
+    \centering
+    \small
+    \begin{tabular}{p{0.38\textwidth} r r}
+        \hline
+        \textbf{Kennzahl} &
+        \textbf{Gesamtwert} &
+        \textbf{Durchschnitt je Request} \\
+        \hline
+        Eingabetokens & 11.913.058 & 11.913 \\
+        Ausgabetokens & 1.392.931 & 1.393 \\
+        Thinking-Tokens & 0 & 0 \\
+        Gesamttokens & 13.305.989 & 13.306 \\
+        Modellkosten & 3,528\,Euro & 0,00353\,Euro \\
+        Lokal protokollierte Laufzeit & -- & 8,220\,Sekunden \\
+        \hline
+    \end{tabular}
+    \caption{Tokenverbrauch, Modellkosten und lokal protokollierte Laufzeit}
+    \label{tab:llm-effizienz}
+\end{table}
+
+Insgesamt wurden 13.305.989 Tokens verarbeitet. Davon entfielen 11.913.058 Tokens beziehungsweise rund 89,5\,\% auf die Eingaben und 1.392.931 Tokens beziehungsweise rund 10,5\,\% auf die Modellausgaben. Der überwiegende Anteil des Verbrauchs entstand somit durch die für jeden Request übermittelten Instruktionen und den vorverarbeiteten Produktkontext. Aufgrund des deaktivierten Thinking-Budgets wurden keine Thinking-Tokens erfasst.
+
+Für die Verarbeitung der 1.000 Transformationsanfragen entstanden Modellkosten von insgesamt rund 3,53\,Euro. Dies entspricht durchschnittlich etwa 0,00353\,Euro beziehungsweise 0,353\,Cent pro Request. Die Werte bilden ausschließlich die unmittelbar anhand des Tokenverbrauchs berechneten Kosten der LLM-basierten Extraktion ab. Lokale Infrastruktur-, Entwicklungs- und Wartungsaufwände sind darin nicht enthalten.
+
+Die durchschnittliche lokal protokollierte Laufzeit betrug 8,220\,Sekunden pro Transformationsanfrage. Für diese Kennzahl werden die Laufzeiten der gespeicherten Pipelineberichte eines Requests summiert. Sie umfasst damit mehrere Verarbeitungsschritte, darunter die HTML-Vorverarbeitung, die regelbasierte Extraktion sowie die nachgelagerte Validierung, Normalisierung und Evaluation. Die Kennzahl stellt folglich weder eine isolierte Inferenzzeit des Sprachmodells noch die Laufzeit eines einzelnen Extraktionszweigs dar.
+
+Aufgrund der zeitlich getrennten LLM-Batch-Verarbeitung ist außerdem die Wartezeit zwischen der Einreichung eines externen Batches und der späteren Bereitstellung seiner Ergebnisse nicht vollständig in der lokalen Laufzeit enthalten. Die ausgewiesenen 8,220\,Sekunden entsprechen daher keiner durchgängigen Ende-zu-Ende-Wandzeit aus Sicht eines aufrufenden Nutzers. Da mehrere Transformationsanfragen asynchron verarbeitet wurden, dürfen die durchschnittlichen Requestlaufzeiten zudem nicht zu einer tatsächlichen Gesamtdauer des Evaluationslaufs addiert werden. Die gemeinsame Bewertung der gemessenen Kosten und Laufzeiten mit der erreichten fachlichen Extraktionsqualität erfolgt in Abschnitt~6.4.1.
+
+\subsection{Fachliche Evaluation der \textit{ProductSizing}-Extraktion}
+
+Die fachliche Evaluation untersucht, in welchem Umfang die beiden Extraktionsansätze die auf den Produktseiten dargestellten Verpackungsgrößen korrekt erkennen. Im Unterschied zur technischen Bewertung des vollständigen LLM-Ergebnisses ist diese Untersuchung auf das Referenzdatenfeld \textit{ProductSizing} begrenzt. Für dieses Feld liegt eine manuell erstellte Ground Truth vor, sodass der LLM-basierte und der regelbasierte Ansatz unter denselben Vergleichsbedingungen bewertet werden können.
+
+Grundlage des Vergleichs sind die deterministisch normalisierten Werte und Einheiten. Eine Vorhersage wird nur dann als korrekt bewertet, wenn beide Bestandteile vollständig mit der Ground Truth übereinstimmen. Neben positiven Referenzfällen werden bestätigte Fälle ohne Masse- oder Volumenangabe einbezogen, um unbelegte Extraktionen zu erfassen. Abschnitt~6.3.1 stellt zunächst die Konfusionsmatrizen und die daraus abgeleiteten Qualitätskennzahlen beider Ansätze gegenüber. Abschnitt~6.3.2 betrachtet anschließend die Ergebnisse auf Ebene der einzelnen Transformationsanfragen und untersucht die wesentlichen Fehlermuster.
+
+\subsubsection{Extraktionsqualität des LLM-basierten und des regelbasierten Ansatzes}
+
+Der fachliche Vergleich umfasst 999 Transformationsanfragen, die den Evaluationsfilter erreichten. Für 903 dieser Fälle lag eine positive Ground Truth mit einer annotierten Verpackungsgröße vor. Die übrigen 96 Datensätze bildeten bestätigte negative Referenzfälle. Tabelle~\ref{tab:extraktionsqualitaet-vergleich} stellt die Konfusionswerte und die daraus abgeleiteten Hauptmetriken beider Extraktionsansätze gegenüber.
+
+\begin{table}[htbp]
+    \centering
+    \small
+    \begin{tabular}{p{0.34\textwidth} r r r}
+        \hline
+        \textbf{Kennzahl} &
+        \textbf{LLM-basiert} &
+        \textbf{Regelbasiert} &
+        \textbf{Differenz} \\
+        \hline
+        True Positives & 897 & 435 & +462 \\
+        False Positives & 35 & 47 & -12 \\
+        False Negatives & 6 & 468 & -462 \\
+        True Negatives & 67 & 86 & -19 \\
+        Precision & 96,24\,\% & 90,25\,\% & +6,00\,PP \\
+        Recall & 99,34\,\% & 48,17\,\% & +51,16\,PP \\
+        F1-Score & 97,77\,\% & 62,82\,\% & +34,95\,PP \\
+        Feldgenauigkeit & 96,50\,\% & 52,15\,\% & +44,34\,PP \\
+        Over-Extraction Rate & 30,21\,\% & 10,42\,\% & +19,79\,PP \\
+        \hline
+    \end{tabular}
+    \caption{Fachliche Extraktionsqualität beider Ansätze für \textit{ProductSizing}}
+    \label{tab:extraktionsqualitaet-vergleich}
+\end{table}
+
+Der LLM-basierte Ansatz extrahierte 897 der 903 vorhandenen Verpackungsgrößen vollständig korrekt. Daraus ergibt sich ein Recall von 99,34\,\%. Für alle positiven Referenzfälle wurde eine Verpackungsgröße ausgegeben, sechs dieser Vorhersagen wichen jedoch hinsichtlich des normalisierten Wertes oder der normalisierten Einheit von der Ground Truth ab. Die Vorhersageabdeckung positiver Fälle betrug somit 100,0\,\%, während die vollständige Übereinstimmung geringfügig darunter lag.
+
+Der regelbasierte Ansatz erreichte 435 True Positives und damit einen Recall von 48,17\,\%. Bei 431 positiven Referenzfällen wurde keine Verpackungsgröße ausgegeben. Weitere 37 Fälle enthielten eine vorhandene, aber von der Ground Truth abweichende Vorhersage. Insgesamt erzeugte der Ansatz für 52,27\,\% der positiven Referenzfälle ein Ergebnis. Die geringere Extraktionsqualität ist damit vor allem auf eine begrenzte Abdeckung der in den Produktseiten vorkommenden Darstellungsformen und Kontexte zurückzuführen. Eine nähere Untersuchung dieser Fehler erfolgt in Abschnitt~6.3.2.
+
+Auch hinsichtlich der Precision erzielte der LLM-basierte Ansatz mit 96,24\,\% einen höheren Wert als der regelbasierte Ansatz mit 90,25\,\%. Von den 932 positiven LLM-Vorhersagen stimmten 897 vollständig mit der Ground Truth überein. Beim regelbasierten Ansatz waren 435 von 482 ausgegebenen Verpackungsgrößen korrekt. Die deutlich höhere Anzahl an LLM-Vorhersagen führte somit nicht zu einer niedrigeren Precision. Der Unterschied zwischen den Verfahren fällt bei dieser Kennzahl mit 6,00 Prozentpunkten jedoch wesentlich geringer aus als beim Recall.
+
+Der F1-Score beträgt für den LLM-basierten Ansatz 97,77\,\% und für den regelbasierten Ansatz 62,82\,\%. Damit verbindet der LLM-basierte Ansatz in der untersuchten Stichprobe eine hohe Erkennung vorhandener Verpackungsgrößen mit einem hohen Anteil korrekter Vorhersagen. Die Feldgenauigkeit, die korrekte positive und korrekte negative Fälle gemeinsam betrachtet, liegt bei 96,50\,\% gegenüber 52,15\,\%.
+
+Bei den bestätigten negativen Referenzfällen zeigt sich dagegen ein gegenläufiges Ergebnis. Der LLM-basierte Ansatz gab in 29 der 96 Fälle ohne annotierte Masse- oder Volumenangabe dennoch eine Verpackungsgröße aus. Dies entspricht einer Over-Extraction Rate von 30,21\,\%. Der regelbasierte Ansatz erzeugte in zehn negativen Fällen eine unbelegte Vorhersage und erreichte damit eine niedrigere Over-Extraction Rate von 10,42\,\%. Entsprechend erkannte der regelbasierte Ansatz 86 negative Fälle korrekt, während der LLM-basierte Ansatz 67 True Negatives erreichte. Die höhere Abdeckung des LLM-basierten Ansatzes geht somit mit einer geringeren Zurückhaltung bei fehlender Verpackungsgröße einher.
+
+Bei der Interpretation der absoluten Konfusionswerte ist die in Abschnitt~6.1.3 definierte Zählweise zu berücksichtigen. Eine von einer positiven Ground Truth abweichende Vorhersage wird gleichzeitig als False Positive und False Negative erfasst. Die Werte für True Positives, False Positives, False Negatives und True Negatives bilden daher keine vollständig disjunkten Fallgruppen und dürfen nicht zu einer Gesamtzahl von Requests addiert werden. Der folgende Abschnitt untersucht die Ergebnisse deshalb zusätzlich gepaart auf Ebene der einzelnen Transformationsanfragen.
+
+\subsubsection{Direkter Vergleich und Fehleranalyse}
+
+Die aggregierten Kennzahlen aus Abschnitt~6.3.1 werden im Folgenden durch einen gepaarten Vergleich auf Ebene der einzelnen Transformationsanfragen ergänzt. Tabelle~\ref{tab:gepaarter-vergleich} ordnet jeden der 999 fachlich ausgewerteten Requests danach ein, ob die Vorhersagen des LLM-basierten und des regelbasierten Ansatzes mit der jeweiligen Ground Truth übereinstimmen. Bei negativen Referenzfällen gilt das Ausbleiben einer Vorhersage als korrekt.
+
+\begin{table}[htbp]
+    \centering
+    \small
+    \begin{tabular}{p{0.50\textwidth} r r}
+        \hline
+        \textbf{Ergebnis auf Request-Ebene} &
+        \textbf{Anzahl} &
+        \textbf{Anteil} \\
+        \hline
+        Beide Ansätze korrekt & 500 & 50,05\,\% \\
+        Nur LLM-basierter Ansatz korrekt & 464 & 46,45\,\% \\
+        Nur regelbasierter Ansatz korrekt & 21 & 2,10\,\% \\
+        Beide Ansätze falsch & 14 & 1,40\,\% \\
+        \hline
+        Gesamt & 999 & 100,00\,\% \\
+        \hline
+    \end{tabular}
+    \caption{Gepaarter Vergleich der Extraktionsergebnisse}
+    \label{tab:gepaarter-vergleich}
+\end{table}
+
+Beide Verfahren erzeugten in 500 Fällen eine korrekte Entscheidung. Diese Gruppe umfasst 434 positive Referenzfälle, bei denen beide Ansätze die Verpackungsgröße vollständig korrekt extrahierten, sowie 66 negative Referenzfälle, bei denen beide auf eine Extraktion verzichteten. In weiteren 464 Fällen war ausschließlich der LLM-basierte Ansatz korrekt. Der umgekehrte Fall trat bei 21 Transformationsanfragen auf. Bei 14 Requests stimmte keine der beiden Vorhersagen mit der Ground Truth überein.
+
+Die Unterschiede zwischen den Verfahren entstehen überwiegend bei positiven Ground-Truth-Fällen. Von den 903 Produktseiten mit vorhandener Verpackungsgröße wurden 434 von beiden Ansätzen korrekt verarbeitet. In 463 Fällen erkannte ausschließlich der LLM-basierte Ansatz den Referenzwert. Bei 430 dieser Fälle erzeugte der regelbasierte Ansatz keine Vorhersage. In weiteren 19 Fällen gab er einen abweichenden Wert und in 14 Fällen eine falsche Einheit beziehungsweise Einheitendimension aus. Nur bei einem positiven Referenzfall war der regelbasierte Ansatz korrekt, während die LLM-basierte Vorhersage von der Ground Truth abwich. Fünf positive Fälle wurden von beiden Verfahren fehlerhaft verarbeitet.
+
+Bei den 96 negativen Referenzfällen zeigte sich ein anderes Verhältnis. In 66 Fällen verzichteten beide Ansätze korrekt auf die Ausgabe einer Verpackungsgröße. In 20 Fällen überextrahierte ausschließlich der LLM-basierte Ansatz, während der regelbasierte Ansatz korrekt keine Vorhersage erzeugte. Ein Fall wurde nur durch den LLM-basierten Ansatz korrekt behandelt, da ausschließlich die regelbasierte Extraktion einen unbelegten Wert ausgab. In neun Fällen erzeugten beide Verfahren trotz fehlender Ground-Truth-Verpackungsgröße eine Vorhersage. Diese Verteilung erklärt die in Abschnitt~6.3.1 festgestellte geringere Over-Extraction Rate des regelbasierten Ansatzes.
+
+Zur näheren Einordnung wurden die fehlerhaften Requests anhand der in der Evaluation gespeicherten Fehlerformen gruppiert. Korrekte negative Entscheidungen werden dabei ausdrücklich aus der Fehlerverteilung ausgeschlossen. Eine negative Ground Truth ohne Vorhersage stellt einen True Negative und keinen unbekannten Fehler dar. Tabelle~\ref{tab:fehlerverteilung-ansaetze} enthält daher ausschließlich Requests, bei denen die jeweilige Methode eine fachlich fehlerhafte Entscheidung traf.
+
+\begin{table}[htbp]
+    \centering
+    \small
+    \begin{tabular}{p{0.50\textwidth} r r}
+        \hline
+        \textbf{Fehlerform} &
+        \textbf{LLM-basiert} &
+        \textbf{Regelbasiert} \\
+        \hline
+        Fehlende Extraktion & 0 & 431 \\
+        Falscher Wert & 2 & 21 \\
+        Falsche Einheit oder Dimension & 3 & 16 \\
+        Fehlerhafte Mehrfachpackungsinterpretation & 1 & 0 \\
+        Überextraktion bei negativer Ground Truth & 29 & 10 \\
+        \hline
+        Fehlerhafte Requests insgesamt & 35 & 478 \\
+        \hline
+    \end{tabular}
+    \caption{Verteilung der beobachteten Fehlerformen ohne True Negatives}
+    \label{tab:fehlerverteilung-ansaetze}
+\end{table}
+
+Das Fehlerprofil des regelbasierten Ansatzes wird mit 431 Fällen deutlich durch fehlende Extraktionen bestimmt. Die formale Kandidatenerkennung und die anschließende Kontextbewertung deckten somit einen erheblichen Teil der im Datensatz vorhandenen Darstellungsformen nicht ab oder verwarfen die erkannten Kandidaten. Wert- und Einheitenfehler traten mit 21 beziehungsweise 16 Fällen wesentlich seltener auf. Die zehn Überextraktionen zeigen zugleich, dass auch die expliziten Ausschluss- und Kontextregeln nicht sämtliche konkurrierenden Mengenangaben zuverlässig zurückhielten.
+
+Beim LLM-basierten Ansatz traten keine vollständig fehlenden Extraktionen für positive Referenzfälle auf. Die häufigste Fehlerform waren stattdessen 29 Überextraktionen bei negativer Ground Truth. Daneben wurden zwei falsche Werte, drei falsche Einheiten beziehungsweise Dimensionen und eine fehlerhafte Mehrfachpackungsinterpretation festgestellt. Das LLM-basierte Verfahren erreichte damit eine hohe Abdeckung vorhandener Verpackungsgrößen, gab jedoch bei fehlender Masse- oder Volumenangabe häufiger einen nicht durch die Ground Truth belegten Wert aus.
+
+Die Einzelfälle verdeutlichen, dass formal ähnliche Angaben innerhalb einer Produktseite unterschiedliche Bedeutungen besitzen können. Bei einem Teeprodukt mit einer Ground Truth von \(70\,\mathrm{g}\) interpretierte das LLM die Angabe \enquote{20 Beutel} als Verpackungsgröße, während der regelbasierte Ansatz die Masse korrekt auswählte. Bei einem Gurkenprodukt mit einem Referenzwert von \(530\,\mathrm{g}\) extrahierten beide Verfahren stattdessen \(970\,\mathrm{ml}\). Ein weiterer Fall enthielt eine Ground Truth von \(720\,\mathrm{ml}\); das LLM gab \(660\,\mathrm{ml}\) aus, während der regelbasierte Ansatz \(395\,\mathrm{g}\) auswählte. Diese Beispiele zeigen, dass Fehler nicht ausschließlich aus dem Erkennen einer Mengenangabe entstehen, sondern insbesondere aus der fachlichen Zuordnung konkurrierender Werte zum Datenfeld \textit{ProductSizing}.
+
+Die Fehlerklassen beschreiben zunächst die beobachtete Abweichung zwischen Vorhersage und Ground Truth. Sie belegen nicht unmittelbar, ob die Ursache in der Vorverarbeitung, der Kandidatenerkennung, der Kontextbewertung oder der semantischen Interpretation des Extraktionsverfahrens liegt. Die Bedeutung der unterschiedlichen Fehlerprofile für die praktische Einsetzbarkeit beider Ansätze wird daher in Abschnitt~6.4.1 gemeinsam mit den technischen und wirtschaftlichen Ergebnissen eingeordnet.
+
+\subsection{Diskussion und Validität}
+
+\subsubsection{Interpretation und praktische Einsetzbarkeit}
+
+\subsubsection{Limitationen und Validitätsbedrohungen}

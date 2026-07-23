@@ -264,72 +264,127 @@ Der resultierende Payload enthält das Modell \texttt{gemini-2.5-flash}, die Pro
 Temperatur auf \texttt{0.0} und das Thinking-Budget auf \texttt{0} gesetzt und gemeinsam mit den Submission-Metadaten gespeichert.
 
 Der Gemini-Adapter übergibt den Systemprompt als \texttt{system\_instruction} und die requestbezogenen Daten als Benutzernachricht. 
-\texttt{response\_mime\_type = application/json} konfiguriert JSON als Antwortformat. Ein providerseitiges \texttt{response\_schema} wird nicht verwendet. Nach der Einreichung wird zunächst nur die externe Batchreferenz gespeichert. Die zugehörigen Anfragen wechseln bis zur Bereitstellung der Antworten in den Zustand \texttt{WAITING\_FOR\_LLM}.
+\texttt{response\_mime\_type = application/json} konfiguriert JSON als Antwortformat. Ein providerseitiges \texttt{response\_schema} wird nicht verwendet. Nach der Einreichung wird 
+zunächst nur die externe Batchreferenz gespeichert. Die zugehörigen Anfragen wechseln bis zur Bereitstellung der Antworten in den Zustand \texttt{WAITING\_FOR\_LLM}.
 
-Beim späteren Abruf verarbeitet der Ergebnisadapter eingebettete Antworten oder eine JSONL-Datei. Die Zuordnung erfolgt nicht über die Reihenfolge, sondern über die zurückgegebene \texttt{domain\_id}. Der Antworttext wird zunächst direkt als JSON gelesen. Enthält er dennoch Markdown-Begrenzungen oder zusätzlichen Text, entfernt der Parser die Begrenzungen beziehungsweise sucht nach einem enthaltenen JSON-Objekt. Die unveränderte Providerantwort bleibt als \texttt{raw\_output} erhalten.
+Beim späteren Abruf verarbeitet der Ergebnisadapter eingebettete Antworten oder eine JSONL-Datei. Die Zuordnung erfolgt nicht über die Reihenfolge, sondern über die zurückgegebene 
+\texttt{domain\_id}. Der Antworttext wird zunächst direkt als JSON gelesen. Enthält er dennoch Markdown-Begrenzungen oder zusätzlichen Text, entfernt der Parser die Begrenzungen 
+beziehungsweise sucht nach einem enthaltenen JSON-Objekt. Die unveränderte Providerantwort bleibt als \texttt{raw\_output} erhalten.
 
-Zusätzlich werden Eingabe-, Antwort-, Thinking- und Gesamttokens sowie die daraus berechneten Kosten gespeichert. Nach Entfernung der technischen Kennung liegt das Ergebnis zunächst als unvalidierte Datenstruktur vor. Erfolgreiches Parsing bestätigt daher nur die syntaktische Verarbeitbarkeit, nicht die Übereinstimmung mit dem internen Produktschema.
+Zusätzlich werden Eingabe-, Antwort-, Thinking- und Gesamttokens sowie die daraus berechneten Kosten gespeichert. Nach Entfernung der technischen Kennung liegt das Ergebnis zunächst 
+als unvalidierte Datenstruktur vor. Erfolgreiches Parsing bestätigt daher nur die syntaktische Verarbeitbarkeit, nicht die Übereinstimmung mit dem internen Produktschema.
 
 \subsection{Umsetzung des regelbasierten Referenzansatzes}
 
-Der regelbasierte Referenzansatz extrahiert ausschließlich das Datenfeld \textit{ProductSizing}. Er verarbeitet dasselbe \texttt{PreprocessingResult} wie der LLM-Zweig und erzeugt deterministisch höchstens eine Verpackungsgröße. Die Implementierung orientiert sich an einer finite-state-inspirierten Kaskade, besitzt jedoch kein formal spezifiziertes Zustands- und Übergangsmodell. Das bereinigte HTML wird zunächst in normalisierten Fließtext überführt. DOM-Zonen, IDs und Klassen werden anschließend nicht mehr direkt ausgewertet.
+Der regelbasierte Referenzansatz extrahiert ausschließlich das Datenfeld \textit{ProductSizing}. Er verarbeitet dasselbe \texttt{PreprocessingResult} wie der LLM-Zweig und erzeugt 
+deterministisch höchstens eine Verpackungsgröße. Die Implementierung orientiert sich an einer finite-state-inspirierten Kaskade, besitzt jedoch kein formal spezifiziertes Zustands- 
+und Übergangsmodell. Das bereinigte HTML wird zunächst in normalisierten Fließtext überführt. DOM-Zonen, IDs und Klassen werden anschließend nicht mehr direkt ausgewertet.
 
 \subsubsection{Kandidatenerkennung}
 
-Die Tokenisierung unterscheidet Zahlen, die Einheiten \texttt{g}, \texttt{kg}, \texttt{ml} und \texttt{l}, Multiplikatoren, Verteilungsangaben und Verpackungsbegriffe. Sowohl deutsche als auch englische Dezimalschreibweisen werden berücksichtigt. Darauf aufbauend erkennt der Filter einfache Mengen wie \texttt{500 g}, Multipacks wie \texttt{6 x 250 ml} und Kombinationen aus Anzahl, Verpackungsbegriff und Einzelmenge wie \texttt{2 Beutel à 100 g}.
+Die Tokenisierung unterscheidet Zahlen, die Einheiten \texttt{g}, \texttt{kg}, \texttt{ml} und \texttt{l}, Multiplikatoren, Verteilungsangaben und Verpackungsbegriffe. Sowohl 
+deutsche als auch englische Dezimalschreibweisen werden berücksichtigt. Darauf aufbauend erkennt der Filter einfache Mengen wie \texttt{500 g}, Multipacks wie \texttt{6 x 250 ml} 
+und Kombinationen aus Anzahl, Verpackungsbegriff und Einzelmenge wie \texttt{2 Beutel à 100 g}.
 
-Jeder Treffer wird mit Originaltext und Zeichenposition gespeichert. Duplikate an derselben Position werden entfernt, während gleichlautende Angaben an verschiedenen Positionen erhalten bleiben. Die formale Erkennung allein bestimmt noch nicht, ob eine Menge tatsächlich eine Verpackungsgröße darstellt.
+Jeder Treffer wird mit Originaltext und Zeichenposition gespeichert. Duplikate an derselben Position werden entfernt, während gleichlautende Angaben an verschiedenen Positionen 
+erhalten bleiben. Die formale Erkennung allein bestimmt noch nicht, ob eine Menge tatsächlich eine Verpackungsgröße darstellt.
 
 \subsubsection{Kontextbewertung und Ausschluss}
 
-Für jeden Kandidaten wird ein Kontextfenster von bis zu 90 Zeichen vor und nach dem Treffer untersucht. Positive Signale umfassen Inhalts- und Nettofüllmengenangaben, Verpackungsbegriffe sowie Multipack- und Verteilungsformulierungen. Negative Signale kennzeichnen unter anderem Grundpreise, Preis- und Pfandkontexte, Nährwertreferenzen, Portionsangaben und Formulierungen wie \textit{pro 100 g}.
+Für jeden Kandidaten wird ein Kontextfenster von bis zu 90 Zeichen vor und nach dem Treffer untersucht. Positive Signale umfassen Inhalts- und Nettofüllmengenangaben, 
+Verpackungsbegriffe sowie Multipack- und Verteilungsformulierungen. Negative Signale kennzeichnen unter anderem Grundpreise, Preis- und Pfandkontexte, Nährwertreferenzen, 
+Portionsangaben und Formulierungen wie \textit{pro 100 g}.
 
-Enthält das Kontextfenster mindestens ein negatives Signal, wird der Kandidat unabhängig von gleichzeitig vorhandenen positiven Hinweisen als \texttt{negative} klassifiziert und ausgeschlossen. Kandidaten mit ausschließlich positiven Signalen werden als \texttt{positive}, Kandidaten ohne erkannte Signale als \texttt{neutral} eingestuft. Neutrale Kandidaten bleiben als Fallback in der weiteren Verarbeitung. Kontextklasse und gefundene Signale werden für die spätere Fehleranalyse im Pipelinekontext gespeichert.
+Enthält das Kontextfenster mindestens ein negatives Signal, wird der Kandidat unabhängig von gleichzeitig vorhandenen positiven Hinweisen als \texttt{negative} klassifiziert 
+und ausgeschlossen. Kandidaten mit ausschließlich positiven Signalen werden als \texttt{positive}, Kandidaten ohne erkannte Signale als \texttt{neutral} eingestuft. Neutrale 
+Kandidaten bleiben als Fallback in der weiteren Verarbeitung. Kontextklasse und gefundene Signale werden für die spätere Fehleranalyse im Pipelinekontext gespeichert.
 
 \subsubsection{Plausibilitätsprüfung und Konfliktlösung}
 
-Positive und neutrale Kandidaten werden in \texttt{ProductSizing}-Objekte überführt. Kilogramm werden in Gramm und Liter in Milliliter umgerechnet. Bei Multipacks wird die Einzelgröße verwendet. \texttt{6 x 250 ml} ergibt somit \texttt{250 ml}. Die vollständige Schreibweise bleibt im Feld \texttt{original\_value} erhalten, während der Multiplikator nicht separat gespeichert und kein Gesamtinhalt berechnet wird.
+Positive und neutrale Kandidaten werden in \texttt{ProductSizing}-Objekte überführt. Kilogramm werden in Gramm und Liter in Milliliter umgerechnet. Bei Multipacks wird die 
+Einzelgröße verwendet. \texttt{6 x 250 ml} ergibt somit \texttt{250 ml}. Die vollständige Schreibweise bleibt im Feld \texttt{original\_value} erhalten, während der 
+Multiplikator nicht separat gespeichert und kein Gesamtinhalt berechnet wird.
 
-Ein Kandidat wird verworfen, wenn sein Wert nicht positiv ist, keine unterstützte Einheit vorliegt oder der normalisierte Wert außerhalb des Bereichs von 1 bis 50.000 Gramm beziehungsweise Millilitern liegt. Die Grenzen bilden heuristische Plausibilitätsregeln.
+Ein Kandidat wird verworfen, wenn sein Wert nicht positiv ist, keine unterstützte Einheit vorliegt oder der normalisierte Wert außerhalb des Bereichs von 1 bis 50.000 
+Gramm beziehungsweise Millilitern liegt. Die Grenzen bilden heuristische Plausibilitätsregeln.
 
-Verbleiben mehrere Kandidaten, erhalten positive Kandidaten einen Grundwert von 100 und neutrale Kandidaten einen Grundwert von 10. Inhalts- und Nettofüllmengenlabels erhöhen den Score um 30 Punkte, Verpackungsbegriffe um 20 Punkte und Hinweise auf Multipacks oder Einzelverteilungen um jeweils 15 Punkte. Die Sortierung erfolgt zuerst nach absteigendem Score und bei Gleichstand nach der Position im Text. Dadurch wird auch bei mehreren plausiblen Angaben deterministisch höchstens ein Ergebnis ausgewählt.
+Verbleiben mehrere Kandidaten, erhalten positive Kandidaten einen Grundwert von 100 und neutrale Kandidaten einen Grundwert von 10. Inhalts- und Nettofüllmengenlabels 
+erhöhen den Score um 30 Punkte, Verpackungsbegriffe um 20 Punkte und Hinweise auf Multipacks oder Einzelverteilungen um jeweils 15 Punkte. Die Sortierung erfolgt zuerst 
+nach absteigendem Score und bei Gleichstand nach der Position im Text. Dadurch wird auch bei mehreren plausiblen Angaben deterministisch höchstens ein Ergebnis ausgewählt.
 
-Das \texttt{RuleBasedExtractionResult} enthält die ausgewählte Verpackungsgröße und die formal erkannten Rohkandidaten. Kontextklassen, Scores, ausgeschlossene Kandidaten und Entscheidungsgründe werden ergänzend im Pipelinekontext abgelegt. Das Ergebnis bleibt von der umfassenderen LLM-Extraktion getrennt und kann unabhängig mit derselben Ground Truth verglichen werden.
+Das \texttt{RuleBasedExtractionResult} enthält die ausgewählte Verpackungsgröße und die formal erkannten Rohkandidaten. Kontextklassen, Scores, ausgeschlossene Kandidaten 
+und Entscheidungsgründe werden ergänzend im Pipelinekontext abgelegt. Das Ergebnis bleibt von der umfassenderen LLM-Extraktion getrennt und kann unabhängig mit derselben 
+Ground Truth verglichen werden.
 
 \subsection{Validierung, Evaluationsunterstützung und Systemintegration}
 
-Die nachgelagerte Verarbeitung überführt die syntaktisch gelesene LLM-Antwort in einen validierten und vereinheitlichten Produktzustand. Rohantwort, validiertes Modell, normalisiertes Modell, Bewertung und Exportergebnis bleiben dabei als getrennte Ergebnisobjekte erhalten.
+Die nachgelagerte Verarbeitung überführt die syntaktisch gelesene LLM-Antwort in einen validierten und vereinheitlichten Produktzustand. Rohantwort, validiertes Modell, 
+normalisiertes Modell, Bewertung und Exportergebnis bleiben dabei als getrennte Ergebnisobjekte erhalten.
 
 \subsubsection{Schema-Validierung und Normalisierung}
 
-Der \texttt{SchemaValidationFilter} überführt die geparste Datenstruktur mithilfe der Pydantic-Methode \texttt{model\_validate} des Modells \texttt{ProductExtraction} in die interne Repräsentation. Geprüft werden insbesondere Datentypen, verschachtelte Teilmodelle und zulässige Enum-Werte. Abweichungen werden mit Datenpfad, Fehlertyp, Beschreibung und geliefertem Wert als strukturierte Validierungsfehler gespeichert. Kann kein gültiges \texttt{ProductExtraction}-Objekt erzeugt werden, endet die Verarbeitung der betroffenen Anfrage im Zustand \texttt{FAILED}. Eine erfolgreiche Schema-Prüfung bestätigt lediglich die technische Modellierbarkeit, nicht die inhaltliche Korrektheit oder Vollständigkeit.
+Der \texttt{SchemaValidationFilter} überführt die geparste Datenstruktur mithilfe der Pydantic-Methode \texttt{model\_validate} des Modells \texttt{ProductExtraction} in 
+die interne Repräsentation. Geprüft werden insbesondere Datentypen, verschachtelte Teilmodelle und zulässige Enum-Werte. Abweichungen werden mit Datenpfad, Fehlertyp, 
+Beschreibung und geliefertem Wert als strukturierte Validierungsfehler gespeichert. Kann kein gültiges \texttt{ProductExtraction}-Objekt erzeugt werden, endet die Verarbeitung 
+der betroffenen Anfrage im Zustand \texttt{FAILED}. Eine erfolgreiche Schema-Prüfung bestätigt lediglich die technische Modellierbarkeit, nicht die inhaltliche Korrektheit 
+oder Vollständigkeit.
 
-Die Validierungsfehler werden aus den von Pydantic gelieferten Fehlerdaten in interne Fehlerobjekte überführt. Hierdurch bleibt erkennbar, an welcher Position des verschachtelten Zielmodells eine Abweichung aufgetreten ist und welcher Wert diese ausgelöst hat. Gleichzeitig bleibt die unveränderte Providerantwort im \texttt{LlmExtractionResult} erhalten. Dadurch lassen sich Fehler des JSON-Parsings, strukturelle Schemaabweichungen und später festgestellte inhaltliche Fehler voneinander unterscheiden.
+Die Validierungsfehler werden aus den von Pydantic gelieferten Fehlerdaten in interne Fehlerobjekte überführt. Hierdurch bleibt erkennbar, an welcher Position des 
+verschachtelten Zielmodells eine Abweichung aufgetreten ist und welcher Wert diese ausgelöst hat. Gleichzeitig bleibt die unveränderte Providerantwort im 
+\texttt{LlmExtractionResult} erhalten. Dadurch lassen sich Fehler des JSON-Parsings, strukturelle Schemaabweichungen und später festgestellte inhaltliche Fehler 
+voneinander unterscheiden.
 
-Der \texttt{NormalizationFilter} verarbeitet eine tiefe Kopie des validierten Modells. Textfelder werden bereinigt, leere Werte in \texttt{null} überführt, der Nutri-Score vereinheitlicht und EAN-Angaben auf Ziffern reduziert. Numerische Werte werden gerundet und unterstützte Größen in gemeinsame Einheiten überführt. Verschachtelte Zutaten werden rekursiv verarbeitet. Für jedes \texttt{ProductSizing} werden \texttt{normalized\_value} und \texttt{normalized\_unit} erneut aus dem ursprünglichen Wert und der Einheit berechnet. Dadurch bleiben validierter und normalisierter Zustand getrennt nachvollziehbar.
+Der \texttt{NormalizationFilter} verarbeitet eine tiefe Kopie des validierten Modells. Textfelder werden bereinigt, leere Werte in \texttt{null} überführt, der 
+Nutri-Score vereinheitlicht und EAN-Angaben auf Ziffern reduziert. Numerische Werte werden gerundet und unterstützte Größen in gemeinsame Einheiten überführt. 
+Verschachtelte Zutaten werden rekursiv verarbeitet. Für jedes \texttt{ProductSizing} werden \texttt{normalized\_value} und \texttt{normalized\_unit} erneut aus 
+dem ursprünglichen Wert und der Einheit berechnet. Dadurch bleiben validierter und normalisierter Zustand getrennt nachvollziehbar.
 
-Die Normalisierung verändert ausschließlich die technische Repräsentation bereits extrahierter Werte. Sie ergänzt keine fehlenden Produktinformationen, löst keine semantischen Widersprüche auf und ersetzt keine fachliche Korrektur des LLM-Ergebnisses. Fehlt ein validiertes Produktmodell, wird stattdessen ein strukturiertes Fehlerergebnis gespeichert und die Anfrage nicht an die nachfolgenden Verarbeitungsschritte übergeben. Nach erfolgreicher Normalisierung wechselt sie in den Zustand \texttt{NORMALIZED}.
+Die Normalisierung verändert ausschließlich die technische Repräsentation bereits extrahierter Werte. Sie ergänzt keine fehlenden Produktinformationen, löst keine 
+semantischen Widersprüche auf und ersetzt keine fachliche Korrektur des LLM-Ergebnisses. Fehlt ein validiertes Produktmodell, wird stattdessen ein strukturiertes 
+Fehlerergebnis gespeichert und die Anfrage nicht an die nachfolgenden Verarbeitungsschritte übergeben. Nach erfolgreicher Normalisierung wechselt sie in den 
+Zustand \texttt{NORMALIZED}.
 
 \subsubsection{Technische Unterstützung der Evaluation}
 
-Der \texttt{EvaluationFilter} lädt die Ground Truth über die Kennung der ursprünglichen Eingabe und stellt ihr das normalisierte LLM-Ergebnis sowie das getrennt gespeicherte regelbasierte Ergebnis gegenüber. Die daraus erzeugten Einzelbewertungen werden am jeweiligen \texttt{TransformationRequest} persistiert. Kann keine auswertbare Referenz zugeordnet werden, wird dies einschließlich des Ausschlussgrundes ebenfalls im Bewertungsergebnis dokumentiert. Die konkrete Festlegung der auswertbaren Referenzfälle, Vergleichsregeln, Metriken und Fehlerkategorien erfolgt in Kapitel 6.
+Der \texttt{EvaluationFilter} lädt die Ground Truth über die Kennung der ursprünglichen Eingabe und stellt ihr das normalisierte LLM-Ergebnis sowie das getrennt 
+gespeicherte regelbasierte Ergebnis gegenüber. Die daraus erzeugten Einzelbewertungen werden am jeweiligen \texttt{TransformationRequest} persistiert. Kann keine 
+auswertbare Referenz zugeordnet werden, wird dies einschließlich des Ausschlussgrundes ebenfalls im Bewertungsergebnis dokumentiert. Die konkrete Festlegung der 
+auswertbaren Referenzfälle, Vergleichsregeln, Metriken und Fehlerkategorien erfolgt in Kapitel 6.
 
-Die requestbezogene Bewertung wird erst nach erfolgreicher Normalisierung und erfolgreichem Produkt-Matching ausgeführt. Anfragen, die bereits beim Parsing, bei der Schema-Validierung oder in einem anderen verpflichtenden Verarbeitungsschritt scheitern, erreichen diesen Filter daher nicht. Ihre Fehler gehen nicht in die methodenspezifische Qualitätsbewertung ein, bleiben jedoch über die technischen Status- und Batchkennzahlen sichtbar.
+Die requestbezogene Bewertung wird erst nach erfolgreicher Normalisierung und erfolgreichem Produkt-Matching ausgeführt. Anfragen, die bereits beim Parsing, bei 
+der Schema-Validierung oder in einem anderen verpflichtenden Verarbeitungsschritt scheitern, erreichen diesen Filter daher nicht. Ihre Fehler gehen nicht in die 
+methodenspezifische Qualitätsbewertung ein, bleiben jedoch über die technischen Status- und Batchkennzahlen sichtbar.
 
-Ein Aggregationsservice fasst die Einzelbewertungen zusammen und ergänzt sie um technische Verarbeitungskennzahlen. Hierzu gehören unter anderem Parsing-, Schema- und Normalisierungsstatus, Laufzeiten, Tokenverbrauch und Kosten. Da Eingaben, Vorhersagen, Referenzdaten und Einzelbewertungen persistent gespeichert sind, kann die Batchbewertung erneut berechnet werden, ohne die LLM- oder Regelverarbeitung zu wiederholen. Der dateibasierte Export erzeugt daraus JSON-, CSV-, Grafik- und Markdown-Artefakte. Diese Dateien bilden keine zusätzliche führende Datenquelle.
+Ein Aggregationsservice fasst die Einzelbewertungen zusammen und ergänzt sie um technische Verarbeitungskennzahlen. Hierzu gehören unter anderem Parsing-, Schema- 
+und Normalisierungsstatus, Laufzeiten, Tokenverbrauch und Kosten. Da Eingaben, Vorhersagen, Referenzdaten und Einzelbewertungen persistent gespeichert sind, kann 
+die Batchbewertung erneut berechnet werden, ohne die LLM- oder Regelverarbeitung zu wiederholen. Der dateibasierte Export erzeugt daraus JSON-, CSV-, Grafik- und 
+Markdown-Artefakte. Diese Dateien bilden keine zusätzliche führende Datenquelle.
 
-Die Evaluation verändert den operativen Status einer erfolgreich transformierten Anfrage nicht. Der Filter ist mit \texttt{continue\_on\_error} konfiguriert, sodass ein technischer Bewertungsfehler den anschließenden Produktexport nicht grundsätzlich verhindert.
+Die Evaluation verändert den operativen Status einer erfolgreich transformierten Anfrage nicht. Der Filter ist mit \texttt{continue\_on\_error} konfiguriert, 
+sodass ein technischer Bewertungsfehler den anschließenden Produktexport nicht grundsätzlich verhindert.
 
 \subsubsection{Nachgelagerte Integration}
 
-Nach der Normalisierung gleicht der \texttt{ProductMatchingFilter} das extrahierte Produkt mit den lokal gespeicherten Produktdaten ab. Die Kandidatensuche berücksichtigt EAN-Angaben, aus der Produktbezeichnung abgeleitete Suchanfragen und bis zu drei Produktgruppen. Mehrfach gefundene Produkte werden über ihre interne Kennung zusammengeführt, anhand von Titel, Marke, EAN, Produktgruppe und Verpackungsgröße bewertet und auf höchstens 15 Kandidaten begrenzt.
+Nach der Normalisierung gleicht der \texttt{ProductMatchingFilter} das extrahierte Produkt mit den lokal gespeicherten Produktdaten ab. Die Kandidatensuche 
+berücksichtigt EAN-Angaben, aus der Produktbezeichnung abgeleitete Suchanfragen und bis zu drei Produktgruppen. Mehrfach gefundene Produkte werden über ihre 
+interne Kennung zusammengeführt, anhand von Titel, Marke, EAN, Produktgruppe und Verpackungsgröße bewertet und auf höchstens 15 Kandidaten begrenzt.
 
-Ein exakter EAN-Treffer wird unmittelbar übernommen. Bei mehreren nicht eindeutigen Kandidaten erhält der synchrone Gemini-Aufruf ausschließlich die zuvor ermittelten Produktkandidaten und darf nur eine ihrer Kennungen auswählen. Dadurch erweitert das Sprachmodell nicht eigenständig den Suchraum. Liefert es keine gültige Kandidatenkennung oder wurden bereits durch die Vorauswahl keine Kandidaten gefunden, wird ein neues lokales Produktobjekt angelegt.
+Ein exakter EAN-Treffer wird unmittelbar übernommen. Bei mehreren nicht eindeutigen Kandidaten erhält der synchrone Gemini-Aufruf ausschließlich die zuvor 
+ermittelten Produktkandidaten und darf nur eine ihrer Kennungen auswählen. Dadurch erweitert das Sprachmodell nicht eigenständig den Suchraum. Liefert es 
+keine gültige Kandidatenkennung oder wurden bereits durch die Vorauswahl keine Kandidaten gefunden, wird ein neues lokales Produktobjekt angelegt.
 
-Bei der Zuordnung zu einem bestehenden Produkt werden die neu extrahierten Angaben mit dem lokal gespeicherten Arbeitsobjekt zusammengeführt. Neue EANs, Produktgruppen und Verpackungsgrößen werden ergänzt, während vorhandene Werte erhalten bleiben, sofern die Extraktion keinen neuen Wert bereitstellt. Dieses lokale Produkt dient ausschließlich dem Matching und der Vorbereitung des Exports. Es ist nicht mit dem produktiv gespeicherten Datensatz des Zielsystems gleichzusetzen.
+Bei der Zuordnung zu einem bestehenden Produkt werden die neu extrahierten Angaben mit dem lokal gespeicherten Arbeitsobjekt zusammengeführt. Neue EANs, 
+Produktgruppen und Verpackungsgrößen werden ergänzt, während vorhandene Werte erhalten bleiben, sofern die Extraktion keinen neuen Wert bereitstellt. Dieses 
+lokale Produkt dient ausschließlich dem Matching und der Vorbereitung des Exports. Es ist nicht mit dem produktiv gespeicherten Datensatz des Zielsystems gleichzusetzen.
 
-Der abschließende \texttt{ExportFilter} lädt das zugeordnete lokale Produkt und übergibt es gemeinsam mit der Transformationsanfrage an den Produktexport-Port. Ein separater Mapper bildet die interne Darstellung auf das erwartete JSON-LD-Zielobjekt ab. Dadurch bleiben die fachlichen Modelle von den Bezeichnern und Verschachtelungen des externen Schemas getrennt. Der erzeugte Ziel-Payload sowie die technische Antwort der Ziel-API werden im \texttt{ExportResult} gespeichert.
+Der abschließende \texttt{ExportFilter} lädt das zugeordnete lokale Produkt und übergibt es gemeinsam mit der Transformationsanfrage an den Produktexport-Port. 
+Ein separater Mapper bildet die interne Darstellung auf das erwartete JSON-LD-Zielobjekt ab. Dadurch bleiben die fachlichen Modelle von den Bezeichnern und 
+Verschachtelungen des externen Schemas getrennt. Der erzeugte Ziel-Payload sowie die technische Antwort der Ziel-API werden im \texttt{ExportResult} gespeichert.
 
-Eine erfolgreiche Antwort der Ziel-API führt zum Zustand \texttt{EXPORTED}. Kommunikationsfehler, abgelehnte Antworten oder fehlende Matching-Daten führen dagegen zu \texttt{FAILED}. Ein direkter Zugriff auf die produktive Datenbank erfolgt nicht. Die abschließende Validierung und produktive Persistierung verbleiben in der Verantwortung der Ziel-API. Evaluationsdaten werden weder in das Produktobjekt aufgenommen noch an diese Schnittstelle übertragen.
+Eine erfolgreiche Antwort der Ziel-API führt zum Zustand \texttt{EXPORTED}. Kommunikationsfehler, abgelehnte Antworten oder fehlende Matching-Daten führen 
+dagegen zu \texttt{FAILED}. Ein direkter Zugriff auf die produktive Datenbank erfolgt nicht. Die abschließende Validierung und produktive Persistierung verbleiben 
+in der Verantwortung der Ziel-API. Evaluationsdaten werden weder in das Produktobjekt aufgenommen noch an diese Schnittstelle übertragen.
 
-Die Implementierung schafft damit eine gemeinsame und nachvollziehbare Ausführungsgrundlage für die nachfolgende Untersuchung. Beide Extraktionsansätze verwenden denselben vorverarbeiteten Produktkontext und dieselbe Definition der Verpackungsgröße, während ihre Ergebnisse getrennt gespeichert werden. Die technische Validierung, Normalisierung und Erfassung der Ausführungsdaten ermöglichen es, Extraktionsqualität und Verarbeitbarkeit in Kapitel 6 getrennt zu bewerten.
+Die Implementierung schafft damit eine gemeinsame und nachvollziehbare Ausführungsgrundlage für die nachfolgende Untersuchung. Beide Extraktionsansätze verwenden 
+denselben vorverarbeiteten Produktkontext und dieselbe Definition der Verpackungsgröße, während ihre Ergebnisse getrennt gespeichert werden. Die technische 
+Validierung, Normalisierung und Erfassung der Ausführungsdaten ermöglichen es, Extraktionsqualität und Verarbeitbarkeit in Kapitel 6 getrennt zu bewerten.

@@ -46,7 +46,9 @@ die Prüfung und Vereinheitlichung der Ergebnisse sowie die kontrollierte Überg
 
 \subsubsection{Funktionale und nicht-funktionale Anforderungen}
 
-Aus der Analyse der Quell- und Zielstrukturen, den technischen Rahmenbedingungen, den informellen Stakeholder-Abstimmungen und dem wissenschaftlichen Vergleichsziel werden die Anforderungen an den Prototyp abgeleitet. Die funktionalen Anforderungen beschreiben die erforderlichen Systemleistungen, während die nicht-funktionalen Anforderungen die maßgeblichen Qualitätseigenschaften festlegen. Die Priorisierung unterscheidet zwischen für das Forschungsziel erforderlichen Muss-Anforderungen und ergänzenden Soll-Anforderungen.
+Aus der Analyse der Quell- und Zielstrukturen, den technischen Rahmenbedingungen, den informellen Stakeholder-Abstimmungen und dem wissenschaftlichen Vergleichsziel werden 
+die Anforderungen an den Prototyp abgeleitet. Die funktionalen Anforderungen beschreiben die erforderlichen Systemleistungen, während die nicht-funktionalen Anforderungen 
+die maßgeblichen Qualitätseigenschaften festlegen. Die Priorisierung unterscheidet zwischen für das Forschungsziel erforderlichen Muss-Anforderungen und ergänzenden Soll-Anforderungen.
 
 \begin{table}[H]
     \centering
@@ -118,7 +120,8 @@ Aus der Analyse der Quell- und Zielstrukturen, den technischen Rahmenbedingungen
     \label{tab:functional-requirements}
 \end{table}
 
-Die funktionalen Anforderungen folgen dem Datenfluss von der Eingabe bis zur Übergabe an das Zielsystem. Die regelbasierte Verarbeitung ist dabei auf \textit{ProductSizing} begrenzt und stellt keine vollständige Alternative zur LLM-basierten Produktextraktion dar. Sie dient als feldspezifische Baseline für den in F9 geforderten Vergleich.
+Die funktionalen Anforderungen folgen dem Datenfluss von der Eingabe bis zur Übergabe an das Zielsystem. Die regelbasierte Verarbeitung ist dabei auf \textit{ProductSizing} begrenzt 
+und stellt keine vollständige Alternative zur LLM-basierten Produktextraktion dar. Sie dient als feldspezifische Baseline für den in F9 geforderten Vergleich.
 
 \begin{table}[H]
     \centering
@@ -170,6 +173,12 @@ Die funktionalen Anforderungen folgen dem Datenfluss von der Eingabe bis zur Üb
     \label{tab:non-functional-requirements}
 \end{table}
 
-Der technische Gestaltungsraum wird durch den bestehenden Projektkontext begrenzt. Der Prototyp wird in Python umgesetzt und verwendet die Gemini API für die LLM-basierte Extraktion sowie die optionale semantische Unterstützung des Produkt-Matchings. Die lokale MongoDB dient ausschließlich als Arbeits-, Transformations- und Evaluationsdatenbank. Die produktive Übergabe erfolgt über die Ziel-API. Das vorgelagerte Crawling-System und das externe Zielschema werden nicht verändert. Ebenso sind das Training eines eigenen Sprachmodells, ein vollständiger regelbasierter Ersatz der Produktextraktion sowie Anforderungen an Hochverfügbarkeit und horizontale Skalierung nicht Bestandteil der Arbeit.
+Der technische Gestaltungsraum wird durch den bestehenden Projektkontext begrenzt. Der Prototyp wird in Python umgesetzt und verwendet die Gemini API für die LLM-basierte Extraktion 
+sowie die optionale semantische Unterstützung des Produkt-Matchings. Die lokale MongoDB dient ausschließlich als Arbeits-, Transformations- und Evaluationsdatenbank. Die produktive 
+Übergabe erfolgt über die Ziel-API. Das vorgelagerte Crawling-System und das externe Zielschema werden nicht verändert. Ebenso sind das Training eines eigenen Sprachmodells, ein 
+vollständiger regelbasierter Ersatz der Produktextraktion sowie Anforderungen an Hochverfügbarkeit und horizontale Skalierung nicht Bestandteil der Arbeit.
 
-Zwingend erforderlich sind damit insbesondere die Vorverarbeitung, die LLM-basierte und regelbasierte Extraktion, die zeitlich getrennte Batch-Verarbeitung, Schema-Validierung, Normalisierung, Persistenz, Evaluation, Fehlerisolation und Übergabe über die Ziel-API. Das semantisch unterstützte Produkt-Matching und zusätzliche Eingabekanäle erhöhen die praktische Nutzbarkeit, sind für den grundlegenden Vergleich der Extraktionsansätze jedoch nachgeordnet. Die Anforderungen bilden die Grundlage für die im folgenden Abschnitt abgeleiteten Architekturziele und Entwurfsentscheidungen.
+Zwingend erforderlich sind damit insbesondere die Vorverarbeitung, die LLM-basierte und regelbasierte Extraktion, die zeitlich getrennte Batch-Verarbeitung, Schema-Validierung, 
+Normalisierung, Persistenz, Evaluation, Fehlerisolation und Übergabe über die Ziel-API. Das semantisch unterstützte Produkt-Matching und zusätzliche Eingabekanäle erhöhen die 
+praktische Nutzbarkeit, sind für den grundlegenden Vergleich der Extraktionsansätze jedoch nachgeordnet. Die Anforderungen bilden die Grundlage für die im folgenden Abschnitt 
+abgeleiteten Architekturziele und Entwurfsentscheidungen.

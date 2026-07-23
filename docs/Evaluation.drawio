@@ -1,0 +1,46 @@
+<mxfile host="Electron">
+  <diagram name="Datensätze" id="8b34nhc_rFW2v1NNSKo5">
+    <mxGraphModel dx="799" dy="482" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="NVu8QXvnWT2ND1oshgjI-1" parent="1" style="shape=trapezoid;perimeter=trapezoidPerimeter;whiteSpace=wrap;html=1;fixedSize=1;rotation=0;flipH=0;legacyAnchorPoints=0;flipV=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=15;fontStyle=1" value="1.257 manuell annotierte&lt;br&gt;Datensätze" vertex="1">
+          <mxGeometry height="80" width="250" x="380" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="NVu8QXvnWT2ND1oshgjI-2" parent="1" style="shape=trapezoid;perimeter=trapezoidPerimeter;whiteSpace=wrap;html=1;fixedSize=1;rotation=0;flipV=1;legacyAnchorPoints=0;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=15;fontStyle=1" value="1.000&lt;div&gt;Lebensmittel-&lt;/div&gt;&lt;div&gt;produktseiten&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="190" x="410" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="NVu8QXvnWT2ND1oshgjI-3" parent="1" style="shape=trapezoid;perimeter=trapezoidPerimeter;whiteSpace=wrap;html=1;fixedSize=1;rotation=0;flipV=1;legacyAnchorPoints=0;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=15;fontStyle=1" value="20 Batches&lt;div&gt;à&lt;/div&gt;&lt;div&gt;50 Daten-&lt;/div&gt;&lt;div&gt;sätzen&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="130" x="440" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="NVu8QXvnWT2ND1oshgjI-4" edge="1" parent="1" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;fontFamily=Helvetica;fontSize=12;fontColor=default;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="370" y="160" as="sourcePoint" />
+            <mxPoint x="370" y="280" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NVu8QXvnWT2ND1oshgjI-6" connectable="0" parent="NVu8QXvnWT2ND1oshgjI-4" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontFamily=Helvetica;fontSize=14;fontColor=default;" value="257&lt;br&gt;ausge-&lt;br&gt;schlossen" vertex="1">
+          <mxGeometry relative="1" x="-0.2306" as="geometry">
+            <mxPoint x="-5" y="14" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NVu8QXvnWT2ND1oshgjI-5" edge="1" parent="1" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;fontFamily=Helvetica;fontSize=12;fontColor=default;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="610" y="270" as="sourcePoint" />
+            <mxPoint x="610" y="390" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NVu8QXvnWT2ND1oshgjI-7" connectable="0" parent="NVu8QXvnWT2ND1oshgjI-5" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontFamily=Helvetica;fontSize=12;fontColor=default;labelBackgroundColor=default;" value="&lt;br&gt;&lt;div&gt;&lt;br/&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.3" y="-1" as="geometry">
+            <mxPoint x="42" y="13" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NVu8QXvnWT2ND1oshgjI-12" connectable="0" parent="NVu8QXvnWT2ND1oshgjI-5" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontFamily=Helvetica;fontSize=14;fontColor=default;" value="Aufteilung&lt;br&gt;in&lt;br&gt;Batches" vertex="1">
+          <mxGeometry relative="1" x="-0.0762" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
